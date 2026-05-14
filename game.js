@@ -163,7 +163,6 @@ function getBadgeStyle(color) {
 
 // ── Photo loading via Wikipedia API with fallback ────────────
 const photoPromiseCache = {};
-const imgVersion = {}; // tracks render version per img id
 
 function getPhotoUrl(name) {
   if (!photoPromiseCache[name]) {
@@ -173,31 +172,25 @@ function getPhotoUrl(name) {
 }
 
 function setPhoto(imgEl, avatarEl, candidate) {
-  // Show avatar immediately
+  // Show avatar immediately (always visible as base layer via z-index)
   avatarEl.textContent      = initials(candidate.name);
   avatarEl.style.background = candidate.color;
-  imgEl.classList.add('hidden');
+
+  // Reset photo — remove loaded class, clear src
+  imgEl.classList.remove('loaded');
   imgEl.src = '';
 
-  // Increment version for this img element
-  const id = imgEl.id;
-  imgVersion[id] = (imgVersion[id] || 0) + 1;
-  const myVersion = imgVersion[id];
-
+  // Fetch and display photo
   getPhotoUrl(candidate.name).then(url => {
     if (!url) return;
-    // Bail out if a newer renderCard has already replaced this candidate
-    if (imgVersion[id] !== myVersion) return;
-    imgEl.onload  = () => {
-      if (imgVersion[id] === myVersion) imgEl.classList.remove('hidden');
-    };
-    imgEl.onerror = () => imgEl.classList.add('hidden');
+    // If src is already this URL (cached), just add loaded
+    if (imgEl.src === url) {
+      imgEl.classList.add('loaded');
+      return;
+    }
+    imgEl.onload  = () => imgEl.classList.add('loaded');
+    imgEl.onerror = () => imgEl.classList.remove('loaded');
     imgEl.src = url;
-    setTimeout(() => {
-      if (imgVersion[id] === myVersion && imgEl.complete && imgEl.naturalWidth > 0) {
-        imgEl.classList.remove('hidden');
-      }
-    }, 50);
   });
 }
 
