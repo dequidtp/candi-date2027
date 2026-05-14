@@ -181,13 +181,17 @@ function setPhoto(imgEl, avatarEl, candidate) {
 
   getPhotoUrl(candidate.name).then(url => {
     if (!url) return;
+    // Set handlers first
     imgEl.onload  = () => imgEl.classList.remove('hidden');
     imgEl.onerror = () => imgEl.classList.add('hidden');
     imgEl.src = url;
-    // If already cached by browser, onload may not fire — force check
-    if (imgEl.complete && imgEl.naturalWidth > 0) {
-      imgEl.classList.remove('hidden');
-    }
+    // Some browsers don't fire onload if image is already in cache
+    // Use setTimeout(0) to let the browser process src assignment first
+    setTimeout(() => {
+      if (imgEl.complete && imgEl.naturalWidth > 0) {
+        imgEl.classList.remove('hidden');
+      }
+    }, 0);
   });
 }
 
