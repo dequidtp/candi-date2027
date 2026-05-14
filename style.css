@@ -212,8 +212,6 @@ body::before { content: ''; position: fixed; inset: 0; pointer-events: none; z-i
   .duel-area { grid-template-columns: 1fr; gap: .5rem; }
   .vs-separator { transform: none; display: flex; justify-content: center; width: 100%; }
   .vs-text { font-size: 1.4rem; }
-  .prev-btn { visibility: hidden; }
-  .prev-btn.visible { visibility: visible; }
   .candidate-card { min-height: unset; padding: .9rem 1rem 1.5rem; }
   .photo-wrap { width: 56px; height: 56px; }
   .fallback-avatar { font-size: 1rem; }
@@ -225,7 +223,7 @@ body::before { content: ''; position: fixed; inset: 0; pointer-events: none; z-i
   .game-title { font-size: 1.5rem; margin-bottom: .2rem; }
   .game-subtitle { font-size: .8rem; margin-bottom: 1rem; }
   .progress-wrap { margin-top: .5rem; margin-bottom: 1rem; }
-  .mobile-bar { display: flex; gap: .6rem; }
+  .mobile-bar { display: flex; justify-content: center; }
   .topbar-actions { gap: .35rem; }
   .topbar-actions .btn { padding: .38rem .65rem; font-size: .72rem; }
   .stats-main { gap: 2rem; padding: 1.2rem .8rem 3rem; }
@@ -239,7 +237,7 @@ body::before { content: ''; position: fixed; inset: 0; pointer-events: none; z-i
   .share-options { grid-template-columns: 1fr 1fr; }
 }
 .desktop-only { display: flex; align-items: center; gap: .5rem; }
-.prev-btn { visibility: hidden; }
-.prev-btn.visible { visibility: visible; }
+.prev-btn { opacity: 0; pointer-events: none; transition: opacity .2s; }
+.prev-btn.visible { opacity: 1; pointer-events: auto; }
 @media (min-width: 769px) { .mobile-bar { display: none; } }
 @media (max-width: 768px) { .desktop-only { display: none; } }
