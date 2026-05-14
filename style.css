@@ -209,11 +209,21 @@ body::before { content: ''; position: fixed; inset: 0; pointer-events: none; z-i
 
 /* ── Responsive ── */
 @media (max-width: 768px) {
-  .duel-area { grid-template-columns: 1fr; gap: 1rem; }
-  .vs-separator { transform: rotate(90deg); }
-  .candidate-card { min-height: 220px; padding: 1.5rem 1.2rem 2.5rem; }
-  .photo-wrap { width: 74px; height: 74px; }
-  .mobile-bar { display: flex; }
+  .duel-area { grid-template-columns: 1fr; gap: .5rem; }
+  .vs-separator { transform: none; }
+  .vs-text { font-size: 1.4rem; }
+  .candidate-card { min-height: unset; padding: .9rem 1rem 1.5rem; }
+  .photo-wrap { width: 56px; height: 56px; }
+  .fallback-avatar { font-size: 1rem; }
+  .card-name { font-size: .95rem; }
+  .card-desc { font-size: .75rem; }
+  .card-badge { font-size: .65rem; padding: .2rem .55rem; }
+  .card-hover-hint { font-size: .65rem; bottom: .4rem; }
+  .game-header { margin-bottom: 1rem; }
+  .game-title { font-size: 1.5rem; margin-bottom: .2rem; }
+  .game-subtitle { font-size: .8rem; margin-bottom: 1rem; }
+  .progress-wrap { margin-top: .5rem; margin-bottom: 1rem; }
+  .mobile-bar { display: flex; gap: .6rem; }
   .topbar-actions { gap: .35rem; }
   .topbar-actions .btn { padding: .38rem .65rem; font-size: .72rem; }
   .stats-main { gap: 2rem; padding: 1.2rem .8rem 3rem; }
@@ -222,8 +232,8 @@ body::before { content: ''; position: fixed; inset: 0; pointer-events: none; z-i
   .stats-table th, .stats-table td { padding: .6rem .7rem; }
   .modal-box { padding: 2rem 1.5rem; }
   .victory-card { padding: 2rem 1.5rem; }
-  .game-main { padding: 1.5rem 1rem 7rem; }
-  .topbar-inner { padding: .75rem 1rem; }
+  .game-main { padding: 1rem .8rem 5rem; }
+  .topbar-inner { padding: .6rem 1rem; }
   .share-options { grid-template-columns: 1fr 1fr; }
 }
 @media (min-width: 769px) { .mobile-bar { display: none; } }
