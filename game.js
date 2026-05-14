@@ -73,7 +73,7 @@ const CANDIDATES = [
   // 🌹 Gauche
   { name: "Jean-Luc Mélenchon",          desc: "Fondateur de LFI",                                      cat: "LFI",                 color: "#cc0000" },
   { name: "Manuel Bompard",              desc: "Coordinateur de LFI",                                   cat: "LFI",                 color: "#bb0000" },
-  { name: "Clémentine Guettée",          desc: "Députée LFI",                                           cat: "LFI",                 color: "#aa0000" },
+  { name: "Clémence Guettée",          desc: "Députée LFI",                                           cat: "LFI",                 color: "#aa0000" },
   { name: "Raphaël Glucksmann",          desc: "Député européen, fondateur de Place Publique",          cat: "Place Publique",      color: "#c2006e" },
   { name: "Marine Tondelier",            desc: "Secrétaire nationale des Écologistes",                  cat: "Les Écologistes",     color: "#2e7d32" },
   { name: "François Ruffin",             desc: "Réalisateur, député",                                   cat: "Debout !",            color: "#b71c1c" },
