@@ -210,8 +210,10 @@ body::before { content: ''; position: fixed; inset: 0; pointer-events: none; z-i
 /* ── Responsive ── */
 @media (max-width: 768px) {
   .duel-area { grid-template-columns: 1fr; gap: .5rem; }
-  .vs-separator { transform: none; }
+  .vs-separator { transform: none; display: flex; justify-content: center; width: 100%; }
   .vs-text { font-size: 1.4rem; }
+  .prev-btn { visibility: hidden; }
+  .prev-btn.visible { visibility: visible; }
   .candidate-card { min-height: unset; padding: .9rem 1rem 1.5rem; }
   .photo-wrap { width: 56px; height: 56px; }
   .fallback-avatar { font-size: 1rem; }
