@@ -162,8 +162,7 @@ function getBadgeStyle(color) {
 }
 
 // ── Photo loading via Wikipedia API with fallback ────────────
-// Cache stores the resolved URL (string) or null
-const photoPromiseCache = {}; // { name: Promise<string|null> }
+const photoPromiseCache = {};
 
 function getPhotoUrl(name) {
   if (!photoPromiseCache[name]) {
@@ -173,25 +172,29 @@ function getPhotoUrl(name) {
 }
 
 function setPhoto(imgEl, avatarEl, candidate) {
-  // Show avatar immediately as base layer
-  avatarEl.textContent       = initials(candidate.name);
-  avatarEl.style.background  = candidate.color;
+  // Show avatar immediately
+  avatarEl.textContent      = initials(candidate.name);
+  avatarEl.style.background = candidate.color;
+
+  // Mark this img as belonging to this candidate
+  imgEl.dataset.candidate = candidate.name;
   imgEl.classList.add('hidden');
   imgEl.src = '';
 
   getPhotoUrl(candidate.name).then(url => {
     if (!url) return;
-    // Set handlers first
-    imgEl.onload  = () => imgEl.classList.remove('hidden');
+    // Only apply if this img element still shows the same candidate
+    if (imgEl.dataset.candidate !== candidate.name) return;
+    imgEl.onload  = () => {
+      if (imgEl.dataset.candidate === candidate.name) imgEl.classList.remove('hidden');
+    };
     imgEl.onerror = () => imgEl.classList.add('hidden');
     imgEl.src = url;
-    // Some browsers don't fire onload if image is already in cache
-    // Use setTimeout(0) to let the browser process src assignment first
     setTimeout(() => {
-      if (imgEl.complete && imgEl.naturalWidth > 0) {
+      if (imgEl.dataset.candidate === candidate.name && imgEl.complete && imgEl.naturalWidth > 0) {
         imgEl.classList.remove('hidden');
       }
-    }, 0);
+    }, 50);
   });
 }
 
