@@ -66,9 +66,14 @@ const CANDIDATES = [
   { name: "Jean Castex",                 desc: "Ancien Premier ministre",                               cat: "Indépendant",         color: "#455a64" },
   { name: "Didier Migaud",               desc: "Ancien président du Conseil constitutionnel",           cat: "Électron libre",      color: "#546e7a" },
   { name: "François Molins",             desc: "Procureur",                                             cat: "Électron libre",      color: "#455a64" },
+  { name: "Marc Fesneau",                desc: "Président du groupe MoDem à l'Assemblée",               cat: "MoDem",               color: "#ff8c00" },
+  { name: "Patrick Mignola",             desc: "Porte-parole du MoDem",                                 cat: "MoDem",               color: "#e07800" },
+  { name: "Jean-Noël Barrot",            desc: "Ministre des Affaires étrangères",                      cat: "MoDem",               color: "#d06800" },
 
   // 🌹 Gauche
   { name: "Jean-Luc Mélenchon",          desc: "Fondateur de LFI",                                      cat: "LFI",                 color: "#cc0000" },
+  { name: "Manuel Bompard",              desc: "Coordinateur de LFI",                                   cat: "LFI",                 color: "#bb0000" },
+  { name: "Clémentine Guettée",          desc: "Députée LFI",                                           cat: "LFI",                 color: "#aa0000" },
   { name: "Raphaël Glucksmann",          desc: "Député européen, fondateur de Place Publique",          cat: "Place Publique",      color: "#c2006e" },
   { name: "Marine Tondelier",            desc: "Secrétaire nationale des Écologistes",                  cat: "Les Écologistes",     color: "#2e7d32" },
   { name: "François Ruffin",             desc: "Réalisateur, député",                                   cat: "Debout !",            color: "#b71c1c" },
@@ -78,6 +83,7 @@ const CANDIDATES = [
   { name: "Olivier Faure",               desc: "Premier secrétaire du PS",                              cat: "PS",                  color: "#d81b60" },
   { name: "Sandrine Rousseau",           desc: "Députée",                                               cat: "Les Écologistes",     color: "#388e3c" },
   { name: "Carole Delga",                desc: "Présidente de la région Occitanie",                     cat: "PS",                  color: "#e91e8c" },
+  { name: "Guillaume Lacroix",           desc: "Président du Parti radical de gauche",                  cat: "PRG",                 color: "#e8334a" },
   { name: "Nathalie Arthaud",            desc: "Ancienne candidate à la présidentielle",                cat: "Lutte Ouvrière",      color: "#8B0000" },
   { name: "Philippe Poutou",             desc: "Libraire",                                              cat: "NPA",                 color: "#b71c1c" },
 
