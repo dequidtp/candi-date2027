@@ -238,4 +238,8 @@ body::before { content: ''; position: fixed; inset: 0; pointer-events: none; z-i
   .topbar-inner { padding: .6rem 1rem; }
   .share-options { grid-template-columns: 1fr 1fr; }
 }
+.desktop-only { display: flex; align-items: center; gap: .5rem; }
+.prev-btn { visibility: hidden; }
+.prev-btn.visible { visibility: visible; }
 @media (min-width: 769px) { .mobile-bar { display: none; } }
+@media (max-width: 768px) { .desktop-only { display: none; } }
