@@ -73,7 +73,7 @@ const CANDIDATES = [
   // 🌹 Gauche
   { name: "Jean-Luc Mélenchon",          desc: "Fondateur de LFI",                                      cat: "LFI",                 color: "#cc0000" },
   { name: "Manuel Bompard",              desc: "Coordinateur de LFI",                                   cat: "LFI",                 color: "#bb0000" },
-  { name: "Clémence Guettée",          desc: "Députée LFI",                                           cat: "LFI",                 color: "#aa0000" },
+  { name: "Clémentine Guettée",          desc: "Députée LFI",                                           cat: "LFI",                 color: "#aa0000" },
   { name: "Raphaël Glucksmann",          desc: "Député européen, fondateur de Place Publique",          cat: "Place Publique",      color: "#c2006e" },
   { name: "Marine Tondelier",            desc: "Secrétaire nationale des Écologistes",                  cat: "Les Écologistes",     color: "#2e7d32" },
   { name: "François Ruffin",             desc: "Réalisateur, député",                                   cat: "Debout !",            color: "#b71c1c" },
@@ -113,7 +113,7 @@ const CANDIDATES = [
   { name: "Jean-Dominique Senard",       desc: "Président de Renault",                                  cat: "Électron libre",      color: "#b71c1c" },
   { name: "Laurent Berger",              desc: "Ex-secrétaire général de la CFDT",                     cat: "Électron libre",      color: "#ad1457" },
   { name: "Matthieu Pigasse",            desc: "Banquier d'affaires, patron de presse",                 cat: "Électron libre",      color: "#1a237e" },
-  { name: "Oussama Ammar",                desc: "Entrepreneur",                                          cat: "Électron libre",      color: "#00695c" },
+  { name: "Oussama Amar",                desc: "Entrepreneur",                                          cat: "Électron libre",      color: "#00695c" },
 
   // 🌍 Société civile
   { name: "José Bové",                   desc: "Syndicaliste agricole, altermondialiste",               cat: "Électron libre",      color: "#4a7c40" },
@@ -227,6 +227,7 @@ function startGame() {
   queue           = shuffle(CANDIDATES);
   totalCandidates = queue.length;
   gameVotes       = {};
+  history         = []; // reset history
   CANDIDATES.forEach(c => { gameVotes[c.name] = 0; });
 
   leftCandidate  = queue.shift();
@@ -240,6 +241,33 @@ function startGame() {
 
   document.getElementById('cardLeft').onclick  = () => handleVote('left');
   document.getElementById('cardRight').onclick = () => handleVote('right');
+  updatePrevBtn();
+  updateProgress();
+}
+
+// ── History for back button ───────────────────────────────────
+let history = []; // each entry: { left, right, loser, winner, queue snapshot }
+
+function updatePrevBtn() {
+  const btn = document.getElementById('prevBtn');
+  if (btn) btn.style.display = history.length > 0 ? 'inline-flex' : 'none';
+}
+
+function goBack() {
+  if (history.length === 0) return;
+  const prev = history.pop();
+
+  // Undo the vote from gameVotes
+  gameVotes[prev.winner.name] = Math.max(0, (gameVotes[prev.winner.name] || 0) - 1);
+
+  // Restore state
+  leftCandidate  = prev.left;
+  rightCandidate = prev.right;
+  queue          = prev.queueSnapshot;
+
+  renderCard('left',  leftCandidate);
+  renderCard('right', rightCandidate);
+  updatePrevBtn();
   updateProgress();
 }
 
@@ -248,6 +276,14 @@ function handleVote(side) {
   const winner      = side === 'left' ? leftCandidate : rightCandidate;
   const loserCardId = side === 'left' ? 'cardRight'   : 'cardLeft';
   const loserCard   = document.getElementById(loserCardId);
+
+  // Save state to history before voting
+  history.push({
+    left:          leftCandidate,
+    right:         rightCandidate,
+    winner:        winner,
+    queueSnapshot: [...queue]
+  });
 
   // Track win for this game
   gameVotes[winner.name] = (gameVotes[winner.name] || 0) + 1;
@@ -285,6 +321,7 @@ function handleVote(side) {
     document.getElementById('cardLeft').style.pointerEvents  = '';
     document.getElementById('cardRight').style.pointerEvents = '';
     updateProgress();
+    updatePrevBtn();
   }, 300);
 }
 
@@ -411,8 +448,8 @@ function selectShareOption(mode) {
 function buildShareText() {
   const url = window.location.origin + window.location.pathname;
   if (shareMode === 'reveal' && currentWinner)
-    return `🗳️ J'ai joué Candi-date 2027 \nMon candidat idéal : ${currentWinner.name}\nEt toi, qui choisirais-tu ? 👉 ${url}`;
-  return `🗳️ J'ai joué à Candi-date 2027 !\nJ'ai mon candidat idéal mais joue avant de le connaître 🙈\nEt toi, qui choisirais-tu ? 👉 ${url}`;
+    return `🗳️ J'ai joué à Présidentielle 2027 — Face à Face !\nMon candidat idéal : ${currentWinner.name}\nEt toi, qui choisirais-tu ? 👉 ${url}`;
+  return `🗳️ J'ai joué à Présidentielle 2027 — Face à Face !\nJ'ai mon candidat idéal mais c'est mon secret 🙈\nEt toi, qui choisirais-tu ? 👉 ${url}`;
 }
 
 function shareWhatsApp() { window.open(`https://wa.me/?text=${encodeURIComponent(buildShareText())}`, '_blank'); }
