@@ -249,8 +249,12 @@ function startGame() {
 let history = []; // each entry: { left, right, loser, winner, queue snapshot }
 
 function updatePrevBtn() {
-  const btn = document.getElementById('prevBtn');
-  if (btn) btn.style.display = history.length > 0 ? 'inline-flex' : 'none';
+  ['prevBtnDesktop', 'prevBtnMobile'].forEach(id => {
+    const btn = document.getElementById(id);
+    if (!btn) return;
+    if (history.length > 0) btn.classList.add('visible');
+    else btn.classList.remove('visible');
+  });
 }
 
 function goBack() {
