@@ -128,8 +128,8 @@ const CANDIDATES = [
   { name: "Thomas Piketty",              desc: "Économiste",                                            cat: "Électron libre",      color: "#00695c" },
   { name: "Gabriel Zucman",              desc: "Économiste",                                            cat: "Électron libre",      color: "#00796b" },
   { name: "Aurélien Barrau",             desc: "Astrophysicien",                                        cat: "Électron libre",      color: "#1a237e" },
-  { name: "Raphaël Enthoven",            desc: "Chroniqueur philo",                                     cat: "Électron libre",      color: "#4527a0" },
-  { name: "Philippe Aghion",             desc: "Économiste",                                           cat: "Électron libre",      color: "#0d47a1" },
+  { name: "Caroline Fourest",            desc: "Editorialiste",                                     cat: "Électron libre",      color: "#4527a0" },
+  { name: "Philippe Aghion",             desc: "Prix nobel d'économie",                                           cat: "Électron libre",      color: "#0d47a1" },
   { name: "Bruno Le Maire",              desc: "Auteur érotique",                                      cat: "Électron libre",      color: "#78716c" },
 ];
 
