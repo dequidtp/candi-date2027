@@ -73,7 +73,7 @@ const CANDIDATES = [
   // 🌹 Gauche
   { name: "Jean-Luc Mélenchon",          desc: "Fondateur de LFI",                                      cat: "LFI",                 color: "#cc0000" },
   { name: "Manuel Bompard",              desc: "Coordinateur de LFI",                                   cat: "LFI",                 color: "#bb0000" },
-  { name: "Clémentine Guettée",          desc: "Députée LFI",                                           cat: "LFI",                 color: "#aa0000" },
+  { name: "Clémence Guettée",          desc: "Députée LFI",                                           cat: "LFI",                 color: "#aa0000" },
   { name: "Raphaël Glucksmann",          desc: "Député européen, fondateur de Place Publique",          cat: "Place Publique",      color: "#c2006e" },
   { name: "Marine Tondelier",            desc: "Secrétaire nationale des Écologistes",                  cat: "Les Écologistes",     color: "#2e7d32" },
   { name: "François Ruffin",             desc: "Réalisateur, député",                                   cat: "Debout !",            color: "#b71c1c" },
@@ -113,7 +113,7 @@ const CANDIDATES = [
   { name: "Jean-Dominique Senard",       desc: "Président de Renault",                                  cat: "Électron libre",      color: "#b71c1c" },
   { name: "Laurent Berger",              desc: "Ex-secrétaire général de la CFDT",                     cat: "Électron libre",      color: "#ad1457" },
   { name: "Matthieu Pigasse",            desc: "Banquier d'affaires, patron de presse",                 cat: "Électron libre",      color: "#1a237e" },
-  { name: "Oussama Amar",                desc: "Entrepreneur",                                          cat: "Électron libre",      color: "#00695c" },
+  { name: "Oussama Ammar",                desc: "Entrepreneur",                                          cat: "Électron libre",      color: "#00695c" },
 
   // 🌍 Société civile
   { name: "José Bové",                   desc: "Syndicaliste agricole, altermondialiste",               cat: "Électron libre",      color: "#4a7c40" },
