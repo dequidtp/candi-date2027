@@ -113,7 +113,7 @@ const CANDIDATES = [
   { name: "Jean-Dominique Senard",       desc: "Président de Renault",                                  cat: "Électron libre",      color: "#b71c1c" },
   { name: "Laurent Berger",              desc: "Ex-secrétaire général de la CFDT",                     cat: "Électron libre",      color: "#ad1457" },
   { name: "Matthieu Pigasse",            desc: "Banquier d'affaires, patron de presse",                 cat: "Électron libre",      color: "#1a237e" },
-  { name: "Oussama Amar",                desc: "Entrepreneur",                                          cat: "Électron libre",      color: "#00695c" },
+  { name: "Oussama Ammar",                desc: "Entrepreneur",                                          cat: "Électron libre",      color: "#00695c" },
 
   // 🌍 Société civile
   { name: "José Bové",                   desc: "Syndicaliste agricole, altermondialiste",               cat: "Électron libre",      color: "#4a7c40" },
