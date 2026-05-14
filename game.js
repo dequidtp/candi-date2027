@@ -181,15 +181,13 @@ function setPhoto(imgEl, avatarEl, candidate) {
 
   getPhotoUrl(candidate.name).then(url => {
     if (!url) return;
-    // Re-check the element is still showing this candidate
-    // by verifying the nearest card still has the same name
-    const nameEl = imgEl.closest('.card-inner')
-      ? imgEl.closest('.card-inner').querySelector('[id^="name"]')
-      : null;
-    // Always apply — onerror handles broken URLs
     imgEl.onload  = () => imgEl.classList.remove('hidden');
     imgEl.onerror = () => imgEl.classList.add('hidden');
     imgEl.src = url;
+    // If already cached by browser, onload may not fire — force check
+    if (imgEl.complete && imgEl.naturalWidth > 0) {
+      imgEl.classList.remove('hidden');
+    }
   });
 }
 
