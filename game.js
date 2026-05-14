@@ -2,7 +2,7 @@
    Présidentielle 2027 — Face à Face
    ============================================================ */
 
-const BACKEND_URL = 'YOUR_VERCEL_URL_HERE';
+const BACKEND_URL = 'https://candi-date2027.vercel.app';
 
 // ── Candidates ───────────────────────────────────────────────
 // photo: Wikipedia Commons URL (thumb 240px) — fallback to initials if broken
