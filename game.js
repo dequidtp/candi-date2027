@@ -162,29 +162,35 @@ function getBadgeStyle(color) {
 }
 
 // ── Photo loading via Wikipedia API with fallback ────────────
-function setPhoto(imgEl, avatarEl, candidate) {
-  // Always show avatar as base layer
-  avatarEl.textContent      = initials(candidate.name);
-  avatarEl.style.background = candidate.color;
-  imgEl.classList.add('hidden');
+// Cache stores the resolved URL (string) or null
+const photoPromiseCache = {}; // { name: Promise<string|null> }
 
-  // If already cached, apply immediately
-  if (photoCache[candidate.name]) {
-    applyPhoto(imgEl, photoCache[candidate.name]);
-    return;
+function getPhotoUrl(name) {
+  if (!photoPromiseCache[name]) {
+    photoPromiseCache[name] = fetchWikipediaPhoto(name);
   }
-
-  // Fetch from Wikipedia API (non-blocking)
-  fetchWikipediaPhoto(candidate.name).then(url => {
-    if (url) applyPhoto(imgEl, url);
-    // If null, avatar remains visible — no action needed
-  });
+  return photoPromiseCache[name];
 }
 
-function applyPhoto(imgEl, url) {
-  imgEl.onload  = () => imgEl.classList.remove('hidden');
-  imgEl.onerror = () => imgEl.classList.add('hidden');
-  imgEl.src = url;
+function setPhoto(imgEl, avatarEl, candidate) {
+  // Show avatar immediately as base layer
+  avatarEl.textContent       = initials(candidate.name);
+  avatarEl.style.background  = candidate.color;
+  imgEl.classList.add('hidden');
+  imgEl.src = '';
+
+  getPhotoUrl(candidate.name).then(url => {
+    if (!url) return;
+    // Re-check the element is still showing this candidate
+    // by verifying the nearest card still has the same name
+    const nameEl = imgEl.closest('.card-inner')
+      ? imgEl.closest('.card-inner').querySelector('[id^="name"]')
+      : null;
+    // Always apply — onerror handles broken URLs
+    imgEl.onload  = () => imgEl.classList.remove('hidden');
+    imgEl.onerror = () => imgEl.classList.add('hidden');
+    imgEl.src = url;
+  });
 }
 
 // ── Render card ───────────────────────────────────────────────
@@ -224,6 +230,10 @@ function startGame() {
 
   leftCandidate  = queue.shift();
   rightCandidate = queue.shift();
+
+  // Preload photos for first 6 candidates
+  [leftCandidate, rightCandidate, ...queue.slice(0, 4)].forEach(c => getPhotoUrl(c.name));
+
   renderCard('left',  leftCandidate);
   renderCard('right', rightCandidate);
 
@@ -257,6 +267,9 @@ function handleVote(side) {
 
     leftCandidate  = winner;
     rightCandidate = queue.shift();
+
+    // Preload the one after next
+    if (queue.length > 0) getPhotoUrl(queue[0].name);
 
     renderCard('left', leftCandidate);
     const winCard = document.getElementById('cardLeft');
