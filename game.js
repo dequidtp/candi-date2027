@@ -411,8 +411,8 @@ function selectShareOption(mode) {
 function buildShareText() {
   const url = window.location.origin + window.location.pathname;
   if (shareMode === 'reveal' && currentWinner)
-    return `🗳️ J'ai joué à Présidentielle 2027 — Face à Face !\nMon candidat idéal : ${currentWinner.name}\nEt toi, qui choisirais-tu ? 👉 ${url}`;
-  return `🗳️ J'ai joué à Présidentielle 2027 — Face à Face !\nJ'ai mon candidat idéal mais c'est mon secret 🙈\nEt toi, qui choisirais-tu ? 👉 ${url}`;
+    return `🗳️ J'ai joué Candi-date 2027 \nMon candidat idéal : ${currentWinner.name}\nEt toi, qui choisirais-tu ? 👉 ${url}`;
+  return `🗳️ J'ai joué à Candi-date 2027 !\nJ'ai mon candidat idéal mais joue avant de le connaître 🙈\nEt toi, qui choisirais-tu ? 👉 ${url}`;
 }
 
 function shareWhatsApp() { window.open(`https://wa.me/?text=${encodeURIComponent(buildShareText())}`, '_blank'); }
