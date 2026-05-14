@@ -2,7 +2,7 @@
    Présidentielle 2027 — Stats page
    ============================================================ */
 
-const PASSWORD = 'pierre_messmer';
+const PASSWORD = 'pierre_messmer1450';
 
 function checkPassword() {
   const input = document.getElementById('passwordInput');
