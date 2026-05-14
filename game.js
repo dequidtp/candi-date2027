@@ -163,6 +163,7 @@ function getBadgeStyle(color) {
 
 // ── Photo loading via Wikipedia API with fallback ────────────
 const photoPromiseCache = {};
+const imgVersion = {}; // tracks render version per img id
 
 function getPhotoUrl(name) {
   if (!photoPromiseCache[name]) {
@@ -175,23 +176,25 @@ function setPhoto(imgEl, avatarEl, candidate) {
   // Show avatar immediately
   avatarEl.textContent      = initials(candidate.name);
   avatarEl.style.background = candidate.color;
-
-  // Mark this img as belonging to this candidate
-  imgEl.dataset.candidate = candidate.name;
   imgEl.classList.add('hidden');
   imgEl.src = '';
 
+  // Increment version for this img element
+  const id = imgEl.id;
+  imgVersion[id] = (imgVersion[id] || 0) + 1;
+  const myVersion = imgVersion[id];
+
   getPhotoUrl(candidate.name).then(url => {
     if (!url) return;
-    // Only apply if this img element still shows the same candidate
-    if (imgEl.dataset.candidate !== candidate.name) return;
+    // Bail out if a newer renderCard has already replaced this candidate
+    if (imgVersion[id] !== myVersion) return;
     imgEl.onload  = () => {
-      if (imgEl.dataset.candidate === candidate.name) imgEl.classList.remove('hidden');
+      if (imgVersion[id] === myVersion) imgEl.classList.remove('hidden');
     };
     imgEl.onerror = () => imgEl.classList.add('hidden');
     imgEl.src = url;
     setTimeout(() => {
-      if (imgEl.dataset.candidate === candidate.name && imgEl.complete && imgEl.naturalWidth > 0) {
+      if (imgVersion[id] === myVersion && imgEl.complete && imgEl.naturalWidth > 0) {
         imgEl.classList.remove('hidden');
       }
     }, 50);
