@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Présidentielle 2027 — Face à Face</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <span class="brand-flag">🗳️</span>
+        <div>
+          <span class="brand-title">Présidentielle 2027</span>
+          <span class="brand-sub">Face à Face</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="game-main" id="gameArea">
+    <div class="game-header">
+      <h1 class="game-title">Pour qui voteriez-vous ?</h1>
+      <p class="game-subtitle">Choisissez votre candidat préféré à chaque duel</p>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-bar-track">
+        <div class="progress-bar-fill" id="progressFill"></div>
+      </div>
+      <p class="progress-label" id="progressLabel">Chargement…</p>
+    </div>
+    <div class="duel-area">
+      <div class="candidate-card" id="cardLeft">
+        <div class="card-inner">
+          <div class="photo-wrap" id="photoLeft">
+            <img class="candidate-photo" id="imgLeft" src="" alt="" loading="lazy" />
+            <div class="avatar fallback-avatar" id="avatarLeft"></div>
+          </div>
+          <div class="card-name" id="nameLeft"></div>
+          <div class="card-desc" id="descLeft"></div>
+          <div class="card-badge" id="badgeLeft"></div>
+        </div>
+        <div class="card-hover-hint">Cliquez pour voter ✓</div>
+      </div>
+      <div class="vs-separator"><span class="vs-text">VS</span></div>
+      <div class="candidate-card" id="cardRight">
+        <div class="card-inner">
+          <div class="photo-wrap" id="photoRight">
+            <img class="candidate-photo" id="imgRight" src="" alt="" loading="lazy" />
+            <div class="avatar fallback-avatar" id="avatarRight"></div>
+          </div>
+          <div class="card-name" id="nameRight"></div>
+          <div class="card-desc" id="descRight"></div>
+          <div class="card-badge" id="badgeRight"></div>
+        </div>
+        <div class="card-hover-hint">Cliquez pour voter ✓</div>
+      </div>
+    </div>
+  </main>
+
+  <!-- VICTORY -->
+  <div class="victory-screen" id="victoryScreen" style="display:none">
+    <div class="confetti-container" id="confettiContainer"></div>
+    <div class="victory-card">
+      <div class="victory-trophy">🏆</div>
+      <p class="victory-label">Votre candidat idéal est…</p>
+      <div class="victory-photo-wrap">
+        <img class="victory-photo" id="victoryImg" src="" alt="" loading="lazy" />
+        <div class="avatar victory-avatar" id="victoryAvatar"></div>
+      </div>
+      <h2 class="victory-name" id="victoryName"></h2>
+      <p class="victory-desc" id="victoryDesc"></p>
+      <div class="card-badge victory-badge" id="victoryBadge"></div>
+      <div class="victory-actions">
+        <button class="btn btn-primary" onclick="restartGame()">🔄 Rejouer</button>
+        <button class="btn btn-share" onclick="openSharePanel()">🔗 Partager</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SHARE PANEL -->
+  <div class="share-overlay" id="shareOverlay" style="display:none" onclick="closeSharePanelOutside(event)">
+    <div class="share-panel">
+      <button class="share-close" onclick="closeSharePanel()">✕</button>
+      <h3 class="share-title">Partager le jeu</h3>
+      <p class="share-subtitle">Voulez-vous révéler votre candidat à vos amis ?</p>
+      <div class="share-options">
+        <div class="share-option selected" id="optReveal" onclick="selectShareOption('reveal')">
+          <div class="share-option-radio active" id="radioReveal"><div class="share-option-dot"></div></div>
+          <div class="share-option-icon">👁️</div>
+          <div class="share-option-label">Révéler</div>
+          <div class="share-option-sub">Vos amis verront votre candidat</div>
+          <div class="share-preview">
+            <div class="share-preview-photo-wrap">
+              <img class="share-preview-photo" id="sharePreviewImg" src="" alt="" />
+              <div class="share-preview-avatar" id="sharePreviewAvatar"></div>
+            </div>
+            <span class="share-preview-name" id="previewName"></span>
+          </div>
+        </div>
+        <div class="share-option" id="optSecret" onclick="selectShareOption('secret')">
+          <div class="share-option-radio" id="radioSecret"></div>
+          <div class="share-option-icon">🙈</div>
+          <div class="share-option-label">Garder secret</div>
+          <div class="share-option-sub">Le nom sera masqué</div>
+          <div class="share-preview">
+            <div class="share-preview-avatar ghost"></div>
+            <div class="share-preview-ghost-name"></div>
+          </div>
+        </div>
+      </div>
+      <div class="share-buttons">
+        <button class="btn btn-whatsapp" onclick="shareWhatsApp()">💬 Partager sur WhatsApp</button>
+        <div class="share-buttons-row">
+          <button class="btn btn-ghost" onclick="copyLink()">📋 Copier le lien</button>
+          <button class="btn btn-ghost" onclick="shareNative()">📤 Autres applis</button>
+        </div>
+      </div>
+      <div class="copy-confirm" id="copyConfirm">✓ Lien copié !</div>
+    </div>
+  </div>
+
+  <nav class="mobile-bar">
+    <button class="btn btn-primary" onclick="restartGame()">🔄 Rejouer</button>
+  </nav>
+
+  <script src="game.js"></script>
+</body>
+</html>

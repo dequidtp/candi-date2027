@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Présidentielle 2027 — Statistiques</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <div class="modal-overlay" id="passwordModal">
+    <div class="modal-box">
+      <div class="modal-icon">🔐</div>
+      <h2 class="modal-title">Accès réservé</h2>
+      <p class="modal-subtitle">Entrez le mot de passe pour accéder aux statistiques</p>
+      <div class="password-field">
+        <input type="password" id="passwordInput" class="password-input" placeholder="Mot de passe…" onkeydown="if(event.key==='Enter') checkPassword()" />
+        <button class="eye-toggle" onclick="toggleEye()" id="eyeBtn">👁</button>
+      </div>
+      <p class="password-error" id="passwordError"></p>
+      <button class="btn btn-primary" onclick="checkPassword()">Entrer</button>
+    </div>
+  </div>
+
+  <div id="statsPage" style="display:none">
+    <header class="topbar">
+      <div class="topbar-inner">
+        <div class="brand">
+          <span class="brand-flag">📊</span>
+          <div>
+            <span class="brand-title">Statistiques</span>
+            <span class="brand-sub">Présidentielle 2027</span>
+          </div>
+        </div>
+        <div class="topbar-actions">
+          <span class="sync-indicator" id="syncIndicator">🔴 Local</span>
+          <button class="btn btn-secondary" onclick="exportCSV()">⬇️ Export CSV</button>
+          <button class="btn btn-danger" onclick="resetStats()">🗑 Reset</button>
+          <a href="index.html" class="btn btn-ghost">← Retour</a>
+        </div>
+      </div>
+    </header>
+
+    <main class="stats-main">
+
+      <div class="empty-state" id="emptyState" style="display:none">
+        <div class="empty-icon">🗳️</div>
+        <h2>Aucune donnée disponible</h2>
+        <p>Aucune partie jouée pour l'instant — allez choisir votre candidat !</p>
+        <a href="index.html" class="btn btn-primary">Jouer maintenant</a>
+      </div>
+
+      <!-- Summary cards -->
+      <div class="stats-summary" id="statsSummary" style="display:none">
+        <div class="summary-card">
+          <div class="summary-value" id="sumGames">0</div>
+          <div class="summary-label">Parties jouées</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-value" id="sumVotes">0</div>
+          <div class="summary-label">Duels joués</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-value" id="sumWinner">—</div>
+          <div class="summary-label">Candidat le plus choisi</div>
+        </div>
+      </div>
+
+      <section class="stats-section" id="section1">
+        <h2 class="stats-section-title">🏆 Classement global</h2>
+        <p class="stats-section-sub">Résultats agrégés sur toutes les parties complètes</p>
+        <div class="table-wrap">
+          <table class="stats-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Candidat</th>
+                <th>Catégorie</th>
+                <th>Total duels gagnés</th>
+                <th>Moy. duels / partie</th>
+                <th>Victoires finales</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="winsBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="stats-section" id="section2">
+        <h2 class="stats-section-title">👑 Grands vainqueurs</h2>
+        <p class="stats-section-sub">Candidats ayant remporté le bracket final au moins une fois</p>
+        <div class="table-wrap">
+          <table class="stats-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Candidat</th>
+                <th>Catégorie</th>
+                <th>Victoires finales</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="finalsBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <script src="game.js"></script>
+  <script src="stats.js"></script>
+</body>
+</html>
