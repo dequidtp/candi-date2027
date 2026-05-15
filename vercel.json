@@ -8,6 +8,15 @@
     { "src": "*.txt",         "use": "@vercel/static" },
     { "src": "assets/**/*",   "use": "@vercel/static" }
   ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Robots-Tag", "value": "all" },
+        { "key": "Access-Control-Allow-Origin", "value": "*" }
+      ]
+    }
+  ],
   "routes": [
     { "src": "/api/game",  "dest": "/api/game.js"  },
     { "src": "/api/stats", "dest": "/api/stats.js" },
