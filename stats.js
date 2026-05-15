@@ -2,7 +2,7 @@
    Présidentielle 2027 — Stats page
    ============================================================ */
 
-const PASSWORD = 'pierre_messmer';
+const PASSWORD = 'Pierre_messmer1450';
 
 function checkPassword() {
   const input = document.getElementById('passwordInput');
@@ -118,9 +118,8 @@ function renderWinsTable(perCandidate, totalGames) {
       <td class="stat-rank">${i + 1}</td>
       <td>
         <div class="stat-candidate">
-          <div class="stat-photo-wrap" style="background:${c.color}">
-            <img class="stat-photo" src="${c.photo || ''}" alt="${c.name}" loading="lazy"
-              onerror="this.classList.add('hidden')" />
+          <div class="stat-photo-wrap" style="background:${c.color}" id="spw-${i}">
+            <img class="stat-photo hidden" id="spi-${i}" alt="${c.name}" loading="lazy" />
             <div class="stat-avatar">${initials(c.name)}</div>
           </div>
           <div>
@@ -140,6 +139,15 @@ function renderWinsTable(perCandidate, totalGames) {
       </td>
     `;
     tbody.appendChild(tr);
+    // Load photo async via Wikipedia API
+    fetchWikipediaPhoto(c.name).then(url => {
+      if (!url) return;
+      const img = document.getElementById(`spi-${i}`);
+      if (!img) return;
+      img.onload  = () => img.classList.remove('hidden');
+      img.onerror = () => img.classList.add('hidden');
+      img.src = url;
+    });
   });
 }
 
@@ -167,8 +175,7 @@ function renderFinalsTable(perCandidate, totalGames) {
       <td>
         <div class="stat-candidate">
           <div class="stat-photo-wrap" style="background:${c.color}">
-            <img class="stat-photo" src="${c.photo || ''}" alt="${c.name}" loading="lazy"
-              onerror="this.classList.add('hidden')" />
+            <img class="stat-photo hidden" id="fpi-${i}" alt="${c.name}" loading="lazy" />
             <div class="stat-avatar">${initials(c.name)}</div>
           </div>
           <div>
@@ -186,6 +193,14 @@ function renderFinalsTable(perCandidate, totalGames) {
       </td>
     `;
     tbody.appendChild(tr);
+    fetchWikipediaPhoto(c.name).then(url => {
+      if (!url) return;
+      const img = document.getElementById(`fpi-${i}`);
+      if (!img) return;
+      img.onload  = () => img.classList.remove('hidden');
+      img.onerror = () => img.classList.add('hidden');
+      img.src = url;
+    });
   });
 }
 
