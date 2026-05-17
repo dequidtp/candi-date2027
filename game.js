@@ -194,7 +194,7 @@ const CANDIDATES = [
   { name: "Raphaël Enthoven",            desc: "Chroniqueur philo",                                        cat: "Électron libre",      color: "#4527a0",
     bio: "Philosophe, chroniqueur et animateur d'émissions culturelles, ancien professeur de philosophie en classes préparatoires. Défenseur acharné de la liberté d'expression et critique du politiquement correct." },
   { name: "Philippe Aghion",             desc: "Économiste",                                               cat: "Électron libre",      color: "#0d47a1",
-    bio: "Prix nobel d'économie, Économiste franco-américain, professeur au Collège de France et à la London School of Economics. Spécialiste de la théorie de la croissance et de l'innovation, conseiller de plusieurs gouvernements européens." },
+    bio: "Économiste franco-américain, professeur au Collège de France et à la London School of Economics. Spécialiste de la théorie de la croissance et de l'innovation, conseiller de plusieurs gouvernements européens." },
   { name: "Bruno Le Maire",              desc: "Auteur érotique",                                          cat: "Électron libre",      color: "#78716c",
     bio: "Ancien ministre de l'Économie de 2017 à 2024, l'un des ministres les plus longtemps en poste sous Macron. A aussi publié plusieurs romans, dont certains à caractère érotique, ce qui lui a valu quelques quolibets." },
 ];
@@ -450,6 +450,235 @@ function saveLocal(payload, winner) {
   localStorage.setItem('bracketStats', JSON.stringify(stored));
 }
 
+// ── Frise ─────────────────────────────────────────────────────
+let friseSegments = []; // { name, color, wins } built during game
+
+function buildFriseSegments() {
+  // Reconstruct segments from history
+  // Each entry in history has left+right candidates
+  // We track who was the "current winner" (left card) at each duel
+  const segs = [];
+  let currentName = null;
+  let currentColor = null;
+  let count = 0;
+
+  history.forEach((entry, i) => {
+    // The winner of this duel is entry.winner
+    const w = entry.winner;
+    if (w.name !== currentName) {
+      if (currentName !== null) {
+        segs.push({ name: currentName, color: currentColor, wins: count });
+      }
+      currentName  = w.name;
+      currentColor = w.color;
+      count = 1;
+    } else {
+      count++;
+    }
+  });
+
+  // Add final winner
+  if (currentWinner) {
+    if (currentWinner.name !== currentName) {
+      if (currentName) segs.push({ name: currentName, color: currentColor, wins: count });
+      segs.push({ name: currentWinner.name, color: currentWinner.color, wins: 1 });
+    } else {
+      segs.push({ name: currentName, color: currentColor, wins: count + 1 });
+    }
+  }
+
+  return segs;
+}
+
+function drawFrise(canvas, winner, isMobile) {
+  const W = isMobile ? 328 : 580;
+  const H = isMobile ? 180 : 185;
+  canvas.width  = W;
+  canvas.height = H;
+
+  const ctx = canvas.getContext('2d');
+  const segments = buildFriseSegments();
+  const totalDuels = segments.reduce((s, seg) => s + seg.wins, 0);
+
+  // Fond blanc
+  ctx.fillStyle = '#ffffff';
+  ctx.beginPath();
+  ctx.roundRect(0, 0, W, H, 12);
+  ctx.fill();
+
+  // Titre + sous-titre
+  ctx.fillStyle = '#1e1b2e';
+  ctx.font = `bold ${isMobile ? 12 : 13}px Georgia, serif`;
+  ctx.fillText('Mon parcours', 16, isMobile ? 20 : 22);
+
+  ctx.fillStyle = '#9ca3af';
+  ctx.font = `${isMobile ? 9 : 10}px sans-serif`;
+  ctx.fillText(`${totalDuels} duels · Candi-date 2027`, 16, isMobile ? 33 : 36);
+
+  // Candidat final (droite)
+  const winnerLabel = isMobile ? '🏆 Final' : '🏆 Candidat final';
+  const winnerName  = winner.name.split(' ').pop(); // nom de famille seulement sur mobile
+  ctx.textAlign = 'right';
+  ctx.fillStyle = '#9ca3af';
+  ctx.font = `${isMobile ? 9 : 10}px sans-serif`;
+  ctx.fillText(winnerLabel, W - 16, isMobile ? 20 : 22);
+  ctx.fillStyle = '#1e1b2e';
+  ctx.font = `bold ${isMobile ? 11 : 12}px Georgia, serif`;
+  ctx.fillText(isMobile ? winnerName : winner.name, W - 16, isMobile ? 33 : 36);
+  ctx.textAlign = 'left';
+
+  // Barre
+  const barX = 16, barY = isMobile ? 44 : 48;
+  const barW = W - 32, barH = isMobile ? 28 : 32;
+  const radius = 8;
+  const SMALL_THRESHOLD = 55; // px
+
+  let x = barX;
+  segments.forEach((seg, i) => {
+    const sw = (seg.wins / totalDuels) * barW;
+    ctx.fillStyle = seg.color;
+    if (i === 0) {
+      ctx.beginPath();
+      ctx.moveTo(x + radius, barY);
+      ctx.lineTo(x + sw, barY);
+      ctx.lineTo(x + sw, barY + barH);
+      ctx.lineTo(x + radius, barY + barH);
+      ctx.arcTo(x, barY + barH, x, barY, radius);
+      ctx.arcTo(x, barY, x + radius, barY, radius);
+      ctx.fill();
+    } else if (i === segments.length - 1) {
+      ctx.beginPath();
+      ctx.moveTo(x, barY);
+      ctx.lineTo(x + sw - radius, barY);
+      ctx.arcTo(x + sw, barY, x + sw, barY + radius, radius);
+      ctx.arcTo(x + sw, barY + barH, x + sw - radius, barY + barH, radius);
+      ctx.lineTo(x, barY + barH);
+      ctx.fill();
+    } else {
+      ctx.fillRect(x, barY, sw, barH);
+    }
+    x += sw;
+  });
+
+  // Séparateurs blancs
+  x = barX;
+  segments.forEach((seg, i) => {
+    x += (seg.wins / totalDuels) * barW;
+    if (i < segments.length - 1) {
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(x, barY);
+      ctx.lineTo(x, barY + barH);
+      ctx.stroke();
+    }
+  });
+
+  // Numéros de duels en blanc dans la barre + noms dessous
+  x = barX;
+  let duelCount = 1;
+  segments.forEach((seg) => {
+    const sw = (seg.wins / totalDuels) * barW;
+    const cx = x + sw / 2;
+    const endDuel = duelCount + seg.wins - 1;
+    const duelLabel = seg.wins === 1
+      ? `${duelCount}`
+      : `${duelCount}→${endDuel}`;
+    const isSmall = sw < SMALL_THRESHOLD;
+
+    // Numéros dans la barre
+    if (sw > 16) {
+      ctx.save();
+      ctx.fillStyle = 'rgba(255,255,255,0.92)';
+      ctx.font = `bold ${isMobile ? 8 : 9}px sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.fillText(duelLabel, cx, barY + barH / 2 + 3);
+      ctx.restore();
+    }
+
+    // Tick
+    const tickY = barY + barH + 5;
+    ctx.strokeStyle = '#d1d5db';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(cx, tickY);
+    ctx.lineTo(cx, tickY + 4);
+    ctx.stroke();
+
+    // Nom
+    ctx.save();
+    ctx.fillStyle = '#374151';
+    ctx.font = `bold ${isMobile ? 8 : 9}px sans-serif`;
+    ctx.textAlign = 'center';
+
+    const nameY = tickY + 5;
+    if (isSmall && !isMobile) {
+      // Vertical pour petits segments sur desktop
+      ctx.translate(cx, nameY + 2);
+      ctx.rotate(-Math.PI / 2);
+      ctx.textAlign = 'right';
+      const shortName = seg.name.split(' ').pop();
+      ctx.fillText(shortName, 0, 3);
+    } else if (sw > 14) {
+      const shortName = isMobile
+        ? seg.name.split(' ').pop()
+        : seg.name;
+      ctx.fillText(shortName, cx, nameY + 11);
+    }
+    ctx.restore();
+
+    duelCount += seg.wins;
+    x += sw;
+  });
+
+  // Footer
+  const footerY = H - 18;
+  ctx.strokeStyle = '#f3f4f6';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(16, footerY - 6);
+  ctx.lineTo(W - 16, footerY - 6);
+  ctx.stroke();
+
+  ctx.fillStyle = '#c4b5fd';
+  ctx.font = `italic ${isMobile ? 8 : 9}px sans-serif`;
+  ctx.fillText('✨ Généré par Candi-date 2027', 16, footerY + 6);
+
+  ctx.fillStyle = '#a78bfa';
+  ctx.font = `bold ${isMobile ? 9 : 10}px Georgia, serif`;
+  ctx.textAlign = 'right';
+  ctx.fillText('candi-date.fr', W - 16, footerY + 6);
+}
+
+function shareFrise() {
+  const canvas = document.getElementById('friseCanvas');
+  const isMobile = window.innerWidth < 769;
+
+  // Redraw at full resolution for sharing
+  const shareCanvas = document.createElement('canvas');
+  drawFrise(shareCanvas, currentWinner, isMobile);
+
+  shareCanvas.toBlob(blob => {
+    const file = new File([blob], 'mon-parcours-candi-date.png', { type: 'image/png' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      navigator.share({
+        title: 'Mon parcours — Candi-date 2027',
+        text: buildShareText(),
+        files: [file]
+      }).catch(() => downloadFrise(shareCanvas));
+    } else {
+      downloadFrise(shareCanvas);
+    }
+  }, 'image/png');
+}
+
+function downloadFrise(canvas) {
+  const a = document.createElement('a');
+  a.download = 'mon-parcours-candi-date.png';
+  a.href = canvas.toDataURL('image/png');
+  a.click();
+}
+
 // ── Victory ───────────────────────────────────────────────────
 function showVictory(winner) {
   currentWinner = winner;
@@ -464,6 +693,12 @@ function showVictory(winner) {
   badge.setAttribute('style', getBadgeStyle(winner.color) + ' margin:0 auto 1.5rem; display:inline-block;');
   document.getElementById('progressFill').style.width  = '100%';
   document.getElementById('progressLabel').textContent = '✓ Tous les duels terminés';
+
+  // Draw frise
+  const friseCanvas = document.getElementById('friseCanvas');
+  const isMobile = window.innerWidth < 769;
+  drawFrise(friseCanvas, winner, isMobile);
+
   launchConfetti();
 }
 
