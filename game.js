@@ -2,7 +2,7 @@
    Présidentielle 2027 — Face à Face
    ============================================================ */
 
-const BACKEND_URL = 'https://candi-date2027.vercel.app';
+const BACKEND_URL = 'https://www.candi-date.fr';
 
 // ── Wikipedia photo cache ─────────────────────────────────────
 // Photos are loaded dynamically via the Wikipedia API (fr + en)
