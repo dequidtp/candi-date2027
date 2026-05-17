@@ -55,6 +55,7 @@
     </div>
     <div class="duel-area">
       <div class="candidate-card" id="cardLeft">
+        <button class="info-btn" id="infoBtnLeft" onclick="event.stopPropagation()">i</button>
         <div class="card-inner">
           <div class="photo-wrap" id="photoLeft">
             <img class="candidate-photo" id="imgLeft" src="" alt="" loading="lazy" />
@@ -68,6 +69,7 @@
       </div>
       <div class="vs-separator"><span class="vs-text">VS</span></div>
       <div class="candidate-card" id="cardRight">
+        <button class="info-btn" id="infoBtnRight" onclick="event.stopPropagation()">i</button>
         <div class="card-inner">
           <div class="photo-wrap" id="photoRight">
             <img class="candidate-photo" id="imgRight" src="" alt="" loading="lazy" />
@@ -81,6 +83,22 @@
       </div>
     </div>
   </main>
+
+  <!-- INFO POPUP -->
+  <div class="info-overlay" id="infoOverlay" style="display:none" onclick="if(event.target===this) closeInfoPopup()">
+    <div class="info-popup">
+      <button class="share-close" onclick="closeInfoPopup()">✕</button>
+      <div class="info-popup-avatar-wrap">
+        <img class="candidate-photo loaded" id="infoImg" src="" alt="" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:top;border-radius:50%;z-index:2;" />
+        <div class="avatar" id="infoAvatar" style="position:absolute;inset:0;width:100%;height:100%;font-size:1.4rem;z-index:1;"></div>
+      </div>
+      <h3 class="info-popup-name" id="infoName"></h3>
+      <p class="info-popup-subtitle" id="infoSubtitle"></p>
+      <div class="info-popup-divider"></div>
+      <p class="info-popup-bio" id="infoBio"></p>
+      <div class="info-popup-ia">✨ Description générée par intelligence artificielle</div>
+    </div>
+  </div>
 
   <!-- VICTORY -->
   <div class="victory-screen" id="victoryScreen" style="display:none">
