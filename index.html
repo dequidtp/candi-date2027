@@ -106,17 +106,22 @@
     <div class="victory-card">
       <div class="victory-trophy">🏆</div>
       <p class="victory-label">Votre candidat idéal est…</p>
-      <div class="victory-photo-wrap">
-        <img class="victory-photo" id="victoryImg" src="" alt="" loading="lazy" />
-        <div class="avatar victory-avatar" id="victoryAvatar"></div>
+
+      <!-- Candidat horizontal compact -->
+      <div class="victory-winner-row">
+        <div class="victory-photo-wrap">
+          <img class="victory-photo" id="victoryImg" src="" alt="" loading="lazy" />
+          <div class="avatar victory-avatar" id="victoryAvatar"></div>
+        </div>
+        <div class="victory-winner-text">
+          <h2 class="victory-name" id="victoryName"></h2>
+          <p class="victory-desc" id="victoryDesc"></p>
+          <div class="card-badge victory-badge" id="victoryBadge"></div>
+        </div>
       </div>
-      <h2 class="victory-name" id="victoryName"></h2>
-      <p class="victory-desc" id="victoryDesc"></p>
-      <div class="card-badge victory-badge" id="victoryBadge"></div>
 
       <!-- Frise -->
       <div class="frise-wrap">
-        <p class="frise-label-title">Mon parcours</p>
         <canvas id="friseCanvas" style="width:100%;border-radius:10px;"></canvas>
       </div>
 
