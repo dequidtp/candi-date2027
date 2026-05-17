@@ -2,7 +2,7 @@
    Présidentielle 2027 — Face à Face
    ============================================================ */
 
-const BACKEND_URL = 'https://www.candi-date.fr';
+const BACKEND_URL = 'YOUR_VERCEL_URL_HERE';
 
 // ── Wikipedia photo cache ─────────────────────────────────────
 // Photos are loaded dynamically via the Wikipedia API (fr + en)
@@ -73,7 +73,7 @@ const CANDIDATES = [
   // 🌹 Gauche
   { name: "Jean-Luc Mélenchon",          desc: "Fondateur de LFI",                                      cat: "LFI",                 color: "#cc0000" },
   { name: "Manuel Bompard",              desc: "Coordinateur de LFI",                                   cat: "LFI",                 color: "#bb0000" },
-  { name: "Clémence Guettée",          desc: "Députée LFI",                                           cat: "LFI",                 color: "#aa0000" },
+  { name: "Clémentine Guettée",          desc: "Députée LFI",                                           cat: "LFI",                 color: "#aa0000" },
   { name: "Raphaël Glucksmann",          desc: "Député européen, fondateur de Place Publique",          cat: "Place Publique",      color: "#c2006e" },
   { name: "Marine Tondelier",            desc: "Secrétaire nationale des Écologistes",                  cat: "Les Écologistes",     color: "#2e7d32" },
   { name: "François Ruffin",             desc: "Réalisateur, député",                                   cat: "Debout !",            color: "#b71c1c" },
@@ -113,7 +113,7 @@ const CANDIDATES = [
   { name: "Jean-Dominique Senard",       desc: "Président de Renault",                                  cat: "Électron libre",      color: "#b71c1c" },
   { name: "Laurent Berger",              desc: "Ex-secrétaire général de la CFDT",                     cat: "Électron libre",      color: "#ad1457" },
   { name: "Matthieu Pigasse",            desc: "Banquier d'affaires, patron de presse",                 cat: "Électron libre",      color: "#1a237e" },
-  { name: "Oussama Ammar",                desc: "Entrepreneur",                                          cat: "Électron libre",      color: "#00695c" },
+  { name: "Oussama Amar",                desc: "Entrepreneur",                                          cat: "Électron libre",      color: "#00695c" },
 
   // 🌍 Société civile
   { name: "José Bové",                   desc: "Syndicaliste agricole, altermondialiste",               cat: "Électron libre",      color: "#4a7c40" },
@@ -128,8 +128,8 @@ const CANDIDATES = [
   { name: "Thomas Piketty",              desc: "Économiste",                                            cat: "Électron libre",      color: "#00695c" },
   { name: "Gabriel Zucman",              desc: "Économiste",                                            cat: "Électron libre",      color: "#00796b" },
   { name: "Aurélien Barrau",             desc: "Astrophysicien",                                        cat: "Électron libre",      color: "#1a237e" },
-  { name: "Caroline Fourest",            desc: "Editorialiste",                                     cat: "Électron libre",      color: "#4527a0" },
-  { name: "Philippe Aghion",             desc: "Prix nobel d'économie",                                           cat: "Électron libre",      color: "#0d47a1" },
+  { name: "Raphaël Enthoven",            desc: "Chroniqueur philo",                                     cat: "Électron libre",      color: "#4527a0" },
+  { name: "Philippe Aghion",             desc: "Économiste",                                           cat: "Électron libre",      color: "#0d47a1" },
   { name: "Bruno Le Maire",              desc: "Auteur érotique",                                      cat: "Électron libre",      color: "#78716c" },
 ];
 
@@ -228,7 +228,7 @@ function startGame() {
   totalCandidates = queue.length;
   gameVotes       = {};
   history         = []; // reset history
-  CANDIDATES.forEach(c => { gameVotes[c.name] = 0; });
+  CANDIDATES.forEach(c => { gameVotes[c.name] = { wins: 0, opponents: [] }; });
 
   leftCandidate  = queue.shift();
   rightCandidate = queue.shift();
@@ -262,7 +262,8 @@ function goBack() {
   const prev = history.pop();
 
   // Undo the vote from gameVotes
-  gameVotes[prev.winner.name] = Math.max(0, (gameVotes[prev.winner.name] || 0) - 1);
+  gameVotes[prev.winner.name].wins = Math.max(0, (gameVotes[prev.winner.name].wins || 0) - 1);
+  gameVotes[prev.winner.name].opponents.pop();
 
   // Restore state
   leftCandidate  = prev.left;
@@ -289,8 +290,10 @@ function handleVote(side) {
     queueSnapshot: [...queue]
   });
 
-  // Track win for this game
-  gameVotes[winner.name] = (gameVotes[winner.name] || 0) + 1;
+  // Track win + opponent for this game
+  const loser = side === 'left' ? rightCandidate : leftCandidate;
+  gameVotes[winner.name].wins = (gameVotes[winner.name].wins || 0) + 1;
+  gameVotes[winner.name].opponents.push(loser.name);
 
   loserCard.classList.add('card-exit');
   document.getElementById('cardLeft').style.pointerEvents  = 'none';
@@ -333,8 +336,9 @@ function handleVote(side) {
 async function submitGameResult(winner) {
   // Build payload
   const votes = CANDIDATES.map(c => ({
-    candidate_name: c.name,
-    wins_in_game:   gameVotes[c.name] || 0,
+    candidate_name:  c.name,
+    wins_in_game:    gameVotes[c.name].wins || 0,
+    opponents:       gameVotes[c.name].opponents || [],
     is_final_winner: c.name === winner.name
   }));
 
