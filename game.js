@@ -194,7 +194,7 @@ const CANDIDATES = [
   { name: "Raphaël Enthoven",            desc: "Chroniqueur philo",                                        cat: "Électron libre",      color: "#4527a0",
     bio: "Philosophe, chroniqueur et animateur d'émissions culturelles, ancien professeur de philosophie en classes préparatoires. Défenseur acharné de la liberté d'expression et critique du politiquement correct." },
   { name: "Philippe Aghion",             desc: "Économiste",                                               cat: "Électron libre",      color: "#0d47a1",
-    bio: "Économiste franco-américain, professeur au Collège de France et à la London School of Economics. Spécialiste de la théorie de la croissance et de l'innovation, conseiller de plusieurs gouvernements européens." },
+    bio: "Prix nobel d'économie, Économiste franco-américain, professeur au Collège de France et à la London School of Economics. Spécialiste de la théorie de la croissance et de l'innovation, conseiller de plusieurs gouvernements européens." },
   { name: "Bruno Le Maire",              desc: "Auteur érotique",                                          cat: "Électron libre",      color: "#78716c",
     bio: "Ancien ministre de l'Économie de 2017 à 2024, l'un des ministres les plus longtemps en poste sous Macron. A aussi publié plusieurs romans, dont certains à caractère érotique, ce qui lui a valu quelques quolibets." },
 ];
