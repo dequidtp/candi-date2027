@@ -104,18 +104,20 @@ body::before { content: ''; position: fixed; inset: 0; pointer-events: none; z-i
 
 /* ── Victory ── */
 .victory-screen { position: fixed; inset: 0; background: rgba(244,240,235,.95); backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center; z-index: 200; padding: 1.5rem; overflow-y: auto; }
-.victory-card { background: var(--card); border-radius: 24px; box-shadow: var(--shadow-lg); padding: 1.5rem 1.75rem 1.5rem; text-align: center; max-width: 520px; width: 100%; position: relative; z-index: 1; animation: slideInRight .4s ease; }
-.victory-trophy { font-size: 2rem; margin-bottom: .3rem; animation: bounce 1s ease infinite alternate; }
+.victory-card { background: var(--card); border-radius: 24px; box-shadow: var(--shadow-lg); padding: 1.25rem 1.5rem 1.25rem; text-align: center; max-width: 520px; width: 100%; position: relative; z-index: 1; animation: slideInRight .4s ease; }
+.victory-trophy { font-size: 1.8rem; margin-bottom: .2rem; animation: bounce 1s ease infinite alternate; }
 @keyframes bounce { from { transform: translateY(0); } to { transform: translateY(-8px); } }
 .victory-label { font-size: .72rem; color: var(--muted); font-weight: 500; margin-bottom: .6rem; letter-spacing: .04em; text-transform: uppercase; }
-.victory-photo-wrap { width: 68px; height: 68px; border-radius: 50%; overflow: hidden; margin: 0 auto .6rem; position: relative; border: 3px solid rgba(134,239,172,.4); box-shadow: 0 4px 16px rgba(0,0,0,.15); background: var(--bg2); }
+.victory-winner-row { display: flex; align-items: center; justify-content: center; gap: .75rem; margin-bottom: .75rem; text-align: left; }
+.victory-photo-wrap { width: 56px; height: 56px; border-radius: 50%; overflow: hidden; position: relative; border: 3px solid rgba(134,239,172,.4); box-shadow: 0 4px 14px rgba(0,0,0,.13); background: var(--bg2); flex-shrink: 0; }
 .victory-photo { width: 100%; height: 100%; object-fit: cover; object-position: top center; display: block; position: absolute; inset: 0; z-index: 2; opacity: 0; transition: opacity .3s ease; }
 .victory-photo.loaded { opacity: 1; }
-.victory-avatar { position: absolute; inset: 0; z-index: 1; display: flex; align-items: center; justify-content: center; font-family: var(--font-d); font-size: 1.3rem; font-weight: 700; color: #fff; }
-.victory-name  { font-family: var(--font-d); font-size: 1.4rem; font-weight: 900; margin-bottom: .2rem; }
-.victory-desc  { color: var(--muted); font-size: .82rem; margin-bottom: .4rem; }
-.victory-badge { margin: 0 auto .5rem; display: inline-block; }
-.victory-actions { display: flex; gap: .75rem; justify-content: center; flex-wrap: wrap; margin-top: 1rem; }
+.victory-avatar { position: absolute; inset: 0; z-index: 1; display: flex; align-items: center; justify-content: center; font-family: var(--font-d); font-size: 1.1rem; font-weight: 700; color: #fff; }
+.victory-winner-text { text-align: left; }
+.victory-name  { font-family: var(--font-d); font-size: 1.3rem; font-weight: 900; margin-bottom: .15rem; }
+.victory-desc  { color: var(--muted); font-size: .8rem; margin-bottom: .3rem; }
+.victory-badge { display: inline-block; }
+.victory-actions { display: flex; gap: .75rem; justify-content: center; flex-wrap: wrap; margin-top: .75rem; }
 
 /* ── Confetti ── */
 .confetti-container { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
