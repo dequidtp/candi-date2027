@@ -1,9 +1,10 @@
 {
-  "name": "presidentielle-2027-face-a-face",
+  "name": "candi-date-2027",
   "version": "2.0.0",
-  "description": "Présidentielle 2027 — Face à Face",
+  "description": "Candi-date 2027",
   "dependencies": {
-    "@supabase/supabase-js": "^2.39.0"
+    "@supabase/supabase-js": "2.26.0",
+    "ws": "^8.0.0"
   },
   "engines": { "node": "20.x" }
 }
