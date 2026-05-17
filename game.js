@@ -492,7 +492,7 @@ function buildFriseSegments() {
 
 function drawFrise(canvas, winner, isMobile) {
   const W = isMobile ? 328 : 580;
-  const H = isMobile ? 180 : 185;
+  const H = isMobile ? 185 : 200;
   canvas.width  = W;
   canvas.height = H;
 
@@ -528,8 +528,8 @@ function drawFrise(canvas, winner, isMobile) {
   ctx.textAlign = 'left';
 
   // Barre
-  const barX = 16, barY = isMobile ? 44 : 48;
-  const barW = W - 32, barH = isMobile ? 28 : 32;
+  const barX = 16, barY = isMobile ? 44 : 50;
+  const barW = W - 32, barH = isMobile ? 32 : 42;
   const radius = 8;
   const SMALL_THRESHOLD = 55; // px
 
@@ -574,65 +574,75 @@ function drawFrise(canvas, winner, isMobile) {
     }
   });
 
-  // Numéros de duels en blanc dans la barre + noms dessous
+  // Numéros + noms dans la barre / légende
   x = barX;
   let duelCount = 1;
+  const bigSegs = [], smallSegs = [];
+
   segments.forEach((seg) => {
     const sw = (seg.wins / totalDuels) * barW;
     const cx = x + sw / 2;
     const endDuel = duelCount + seg.wins - 1;
-    const duelLabel = seg.wins === 1
-      ? `${duelCount}`
-      : `${duelCount}→${endDuel}`;
-    const isSmall = sw < SMALL_THRESHOLD;
+    const duelLabel = seg.wins === 1 ? `${duelCount}` : `${duelCount}→${endDuel}`;
+    const isLarge = sw >= SMALL_THRESHOLD;
 
-    // Numéros dans la barre
-    if (sw > 16) {
+    if (isLarge) {
+      // Nom + numéros en blanc dans la barre
       ctx.save();
-      ctx.fillStyle = 'rgba(255,255,255,0.92)';
-      ctx.font = `bold ${isMobile ? 8 : 9}px sans-serif`;
+      ctx.fillStyle = 'rgba(255,255,255,.95)';
+      ctx.font = `bold ${isMobile ? 9 : 10}px sans-serif`;
       ctx.textAlign = 'center';
-      ctx.fillText(duelLabel, cx, barY + barH / 2 + 3);
+      ctx.fillText(seg.name, cx, barY + barH / 2 - 3);
+      ctx.fillStyle = 'rgba(255,255,255,.8)';
+      ctx.font = `${isMobile ? 7 : 8}px sans-serif`;
+      ctx.fillText(duelLabel, cx, barY + barH / 2 + 9);
       ctx.restore();
+      bigSegs.push({ ...seg, sw, cx, duelLabel });
+    } else {
+      // Juste numéros si assez large
+      if (sw > 16) {
+        ctx.save();
+        ctx.fillStyle = 'rgba(255,255,255,.85)';
+        ctx.font = `bold ${isMobile ? 6.5 : 7}px sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.fillText(duelLabel, cx, barY + barH / 2 + 3);
+        ctx.restore();
+      }
+      smallSegs.push({ ...seg, sw, cx, duelLabel });
     }
-
-    // Tick
-    const tickY = barY + barH + 5;
-    ctx.strokeStyle = '#d1d5db';
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(cx, tickY);
-    ctx.lineTo(cx, tickY + 4);
-    ctx.stroke();
-
-    // Nom
-    ctx.save();
-    ctx.fillStyle = '#374151';
-    ctx.font = `bold ${isMobile ? 8 : 9}px sans-serif`;
-    ctx.textAlign = 'center';
-
-    const nameY = tickY + 5;
-    if (isSmall && !isMobile) {
-      // Vertical pour petits segments sur desktop
-      ctx.translate(cx, nameY + 2);
-      ctx.rotate(-Math.PI / 2);
-      ctx.textAlign = 'right';
-      const shortName = seg.name.split(' ').pop();
-      ctx.fillText(shortName, 0, 3);
-    } else if (sw > 14) {
-      const shortName = isMobile
-        ? seg.name.split(' ').pop()
-        : seg.name;
-      ctx.fillText(shortName, cx, nameY + 11);
-    }
-    ctx.restore();
 
     duelCount += seg.wins;
     x += sw;
   });
 
+  // Légende pour petits segments
+  if (smallSegs.length > 0) {
+    const legendY = barY + barH + 22;
+    ctx.font = `${isMobile ? 7.5 : 8}px sans-serif`;
+
+    const items = smallSegs.map(seg => {
+      const label = `${seg.name} (${seg.duelLabel})`;
+      const labelW = ctx.measureText(label).width;
+      return { ...seg, label, itemW: 10 + 4 + labelW };
+    });
+
+    const totalW = items.reduce((s, it) => s + it.itemW, 0) + (items.length - 1) * 10;
+    let lx = barX + (barW - totalW) / 2;
+
+    items.forEach(item => {
+      ctx.fillStyle = item.color;
+      ctx.beginPath();
+      ctx.roundRect(lx, legendY - 7, 8, 8, 2);
+      ctx.fill();
+      ctx.fillStyle = '#374151';
+      ctx.textAlign = 'left';
+      ctx.fillText(item.label, lx + 12, legendY);
+      lx += item.itemW + 10;
+    });
+  }
+
   // Footer
-  const footerY = H - 18;
+  const footerY = H - 14;
   ctx.strokeStyle = '#f3f4f6';
   ctx.lineWidth = 1;
   ctx.beginPath();
@@ -642,12 +652,13 @@ function drawFrise(canvas, winner, isMobile) {
 
   ctx.fillStyle = '#c4b5fd';
   ctx.font = `italic ${isMobile ? 8 : 9}px sans-serif`;
-  ctx.fillText('✨ Généré par Candi-date 2027', 16, footerY + 6);
+  ctx.textAlign = 'left';
+  ctx.fillText('✨ Généré par Candi-date 2027', 16, footerY + 5);
 
   ctx.fillStyle = '#a78bfa';
   ctx.font = `bold ${isMobile ? 9 : 10}px Georgia, serif`;
   ctx.textAlign = 'right';
-  ctx.fillText('candi-date.fr', W - 16, footerY + 6);
+  ctx.fillText('candi-date.fr', W - 16, footerY + 5);
 }
 
 function shareFrise() {
@@ -762,7 +773,38 @@ function buildShareText() {
   return `J'ai joué à Candi-date 2027 !\nJ'ai mon candidat idéal mais je t'influence pas ;)\n${url}`;
 }
 
-function shareWhatsApp() { window.open(`https://wa.me/?text=${encodeURIComponent(buildShareText())}`, '_blank'); }
+function shareWhatsApp() {
+  if (shareMode === 'reveal') {
+    // Génère la frise et partage avec le texte
+    const shareCanvas = document.createElement('canvas');
+    const isMobile = window.innerWidth < 769;
+    drawFrise(shareCanvas, currentWinner, isMobile);
+
+    shareCanvas.toBlob(blob => {
+      const file = new File([blob], 'mon-parcours-candi-date.png', { type: 'image/png' });
+      const text = buildShareText();
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        navigator.share({
+          title: 'Mon parcours — Candi-date 2027',
+          text,
+          files: [file]
+        }).catch(() => {
+          // Fallback : télécharge la frise puis ouvre WhatsApp avec le texte
+          downloadFrise(shareCanvas);
+          setTimeout(() => window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank'), 500);
+        });
+      } else {
+        // Télécharge la frise puis ouvre WhatsApp
+        downloadFrise(shareCanvas);
+        setTimeout(() => window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank'), 500);
+      }
+    }, 'image/png');
+  } else {
+    // Secret : juste le texte sur WhatsApp
+    window.open(`https://wa.me/?text=${encodeURIComponent(buildShareText())}`, '_blank');
+  }
+}
+
 function copyLink() {
   navigator.clipboard.writeText(buildShareText()).then(() => {
     const el = document.getElementById('copyConfirm');
@@ -770,9 +812,25 @@ function copyLink() {
     setTimeout(() => el.classList.remove('visible'), 2500);
   });
 }
+
 function shareNative() {
-  if (navigator.share) navigator.share({ title: 'Candi-date 2027', text: buildShareText(), url: window.location.href });
-  else copyLink();
+  if (shareMode === 'reveal') {
+    const shareCanvas = document.createElement('canvas');
+    const isMobile = window.innerWidth < 769;
+    drawFrise(shareCanvas, currentWinner, isMobile);
+    shareCanvas.toBlob(blob => {
+      const file = new File([blob], 'mon-parcours-candi-date.png', { type: 'image/png' });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        navigator.share({ title: 'Candi-date 2027', text: buildShareText(), files: [file] })
+          .catch(() => copyLink());
+      } else {
+        downloadFrise(shareCanvas);
+      }
+    }, 'image/png');
+  } else {
+    if (navigator.share) navigator.share({ title: 'Candi-date 2027', text: buildShareText(), url: window.location.href });
+    else copyLink();
+  }
 }
 
 // ── Init ──────────────────────────────────────────────────────
