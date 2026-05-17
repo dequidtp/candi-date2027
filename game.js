@@ -282,10 +282,6 @@ function openInfoPopup(candidate, event) {
   document.getElementById('infoSubtitle').textContent = candidate.cat + ' · ' + candidate.desc;
   document.getElementById('infoBio').textContent = candidate.bio || '';
 
-  const badge = document.getElementById('infoBadge');
-  badge.textContent = candidate.cat;
-  badge.setAttribute('style', getBadgeStyle(candidate.color));
-
   overlay.style.display = 'flex';
 }
 
