@@ -113,6 +113,13 @@
       <h2 class="victory-name" id="victoryName"></h2>
       <p class="victory-desc" id="victoryDesc"></p>
       <div class="card-badge victory-badge" id="victoryBadge"></div>
+
+      <!-- Frise -->
+      <div class="frise-wrap">
+        <p class="frise-label-title">Mon parcours</p>
+        <canvas id="friseCanvas" style="width:100%;border-radius:10px;"></canvas>
+      </div>
+
       <div class="victory-actions">
         <button class="btn btn-primary" onclick="restartGame()">🔄 Rejouer</button>
         <button class="btn btn-share" onclick="openSharePanel()">🔗 Partager</button>
@@ -153,6 +160,7 @@
       </div>
       <div class="share-buttons">
         <button class="btn btn-whatsapp" onclick="shareWhatsApp()">💬 Partager sur WhatsApp</button>
+        <button class="btn btn-secondary" style="width:100%;justify-content:center;" onclick="shareFrise()">🖼️ Partager ma frise</button>
         <div class="share-buttons-row">
           <button class="btn btn-ghost" onclick="copyLink()">📋 Copier le lien</button>
           <button class="btn btn-ghost" onclick="shareNative()">📤 Autres applis</button>
