@@ -491,47 +491,42 @@ function buildFriseSegments() {
 }
 
 function drawFrise(canvas, winner, isMobile) {
-  const W = isMobile ? 328 : 580;
-  const H = isMobile ? 185 : 200;
-  canvas.width  = W;
-  canvas.height = H;
+  const dpr = Math.max(window.devicePixelRatio || 1, 2);
+  const W = isMobile ? 320 : 580;
+
+  // Calculate height dynamically based on content
+  const barH = isMobile ? 38 : 46;
+  const legendEstimate = 30; // space for potential legend
+  const H = isMobile ? 110 + legendEstimate : 120 + legendEstimate;
+
+  canvas.width  = W * dpr;
+  canvas.height = H * dpr;
+  canvas.style.width  = W + 'px';
+  canvas.style.height = H + 'px';
 
   const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+
   const segments = buildFriseSegments();
   const totalDuels = segments.reduce((s, seg) => s + seg.wins, 0);
 
   // Fond blanc
-  ctx.fillStyle = '#ffffff';
+  ctx.fillStyle = '#f9f9f9';
   ctx.beginPath();
-  ctx.roundRect(0, 0, W, H, 12);
+  ctx.roundRect(0, 0, W, H, 10);
   ctx.fill();
 
-  // Titre + sous-titre
+  // Titre
   ctx.fillStyle = '#1e1b2e';
-  ctx.font = `bold ${isMobile ? 12 : 13}px Georgia, serif`;
-  ctx.fillText('Mon parcours', 16, isMobile ? 20 : 22);
-
-  ctx.fillStyle = '#9ca3af';
-  ctx.font = `${isMobile ? 9 : 10}px sans-serif`;
-  ctx.fillText(`${totalDuels} duels · Candi-date 2027`, 16, isMobile ? 33 : 36);
-
-  // Candidat final (droite)
-  const winnerLabel = isMobile ? '🏆 Final' : '🏆 Candidat final';
-  const winnerName  = winner.name.split(' ').pop(); // nom de famille seulement sur mobile
-  ctx.textAlign = 'right';
-  ctx.fillStyle = '#9ca3af';
-  ctx.font = `${isMobile ? 9 : 10}px sans-serif`;
-  ctx.fillText(winnerLabel, W - 16, isMobile ? 20 : 22);
-  ctx.fillStyle = '#1e1b2e';
-  ctx.font = `bold ${isMobile ? 11 : 12}px Georgia, serif`;
-  ctx.fillText(isMobile ? winnerName : winner.name, W - 16, isMobile ? 33 : 36);
+  ctx.font = `bold ${isMobile ? 11 : 13}px Georgia, serif`;
   ctx.textAlign = 'left';
+  ctx.fillText('Mon parcours', 0, isMobile ? 13 : 14);
 
   // Barre
-  const barX = 16, barY = isMobile ? 44 : 50;
-  const barW = W - 32, barH = isMobile ? 32 : 42;
+  const barX = 0, barY = isMobile ? 18 : 20;
+  const barW = W;
   const radius = 8;
-  const SMALL_THRESHOLD = 55; // px
+  const SMALL_THRESHOLD = 60;
 
   let x = barX;
   segments.forEach((seg, i) => {
@@ -560,26 +555,22 @@ function drawFrise(canvas, winner, isMobile) {
     x += sw;
   });
 
-  // Séparateurs blancs
+  // Séparateurs
   x = barX;
   segments.forEach((seg, i) => {
     x += (seg.wins / totalDuels) * barW;
     if (i < segments.length - 1) {
-      ctx.strokeStyle = '#fff';
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.moveTo(x, barY);
-      ctx.lineTo(x, barY + barH);
-      ctx.stroke();
+      ctx.strokeStyle = '#fff'; ctx.lineWidth = 2.5;
+      ctx.beginPath(); ctx.moveTo(x, barY); ctx.lineTo(x, barY + barH); ctx.stroke();
     }
   });
 
-  // Numéros + noms dans la barre / légende
+  // Texte dans barre + classification
+  const smallSegs = [];
   x = barX;
   let duelCount = 1;
-  const bigSegs = [], smallSegs = [];
 
-  segments.forEach((seg) => {
+  segments.forEach(seg => {
     const sw = (seg.wins / totalDuels) * barW;
     const cx = x + sw / 2;
     const endDuel = duelCount + seg.wins - 1;
@@ -587,23 +578,20 @@ function drawFrise(canvas, winner, isMobile) {
     const isLarge = sw >= SMALL_THRESHOLD;
 
     if (isLarge) {
-      // Nom + numéros en blanc dans la barre
       ctx.save();
       ctx.fillStyle = 'rgba(255,255,255,.95)';
-      ctx.font = `bold ${isMobile ? 9 : 10}px sans-serif`;
+      ctx.font = `bold ${isMobile ? 10 : 11}px sans-serif`;
       ctx.textAlign = 'center';
-      ctx.fillText(seg.name, cx, barY + barH / 2 - 3);
+      ctx.fillText(seg.name, cx, barY + barH / 2 - 4);
       ctx.fillStyle = 'rgba(255,255,255,.8)';
-      ctx.font = `${isMobile ? 7 : 8}px sans-serif`;
+      ctx.font = `${isMobile ? 8 : 9}px sans-serif`;
       ctx.fillText(duelLabel, cx, barY + barH / 2 + 9);
       ctx.restore();
-      bigSegs.push({ ...seg, sw, cx, duelLabel });
     } else {
-      // Juste numéros si assez large
-      if (sw > 16) {
+      if (sw > 18) {
         ctx.save();
         ctx.fillStyle = 'rgba(255,255,255,.85)';
-        ctx.font = `bold ${isMobile ? 6.5 : 7}px sans-serif`;
+        ctx.font = `bold ${isMobile ? 7 : 8}px sans-serif`;
         ctx.textAlign = 'center';
         ctx.fillText(duelLabel, cx, barY + barH / 2 + 3);
         ctx.restore();
@@ -615,50 +603,48 @@ function drawFrise(canvas, winner, isMobile) {
     x += sw;
   });
 
-  // Légende pour petits segments
+  // Légende multiligne pour petits segments
   if (smallSegs.length > 0) {
-    const legendY = barY + barH + 22;
-    ctx.font = `${isMobile ? 7.5 : 8}px sans-serif`;
+    const fs = isMobile ? 8 : 9;
+    ctx.font = `${fs}px sans-serif`;
+    const lineH = fs + 6, colGap = 10;
+    const legendBaseY = barY + barH + 14;
 
     const items = smallSegs.map(seg => {
       const label = `${seg.name} (${seg.duelLabel})`;
-      const labelW = ctx.measureText(label).width;
-      return { ...seg, label, itemW: 10 + 4 + labelW };
+      return { ...seg, label, itemW: 12 + ctx.measureText(label).width };
     });
 
-    const totalW = items.reduce((s, it) => s + it.itemW, 0) + (items.length - 1) * 10;
-    let lx = barX + (barW - totalW) / 2;
+    // Répartir en lignes
+    const lines = []; let line = [], lw = 0;
+    items.forEach(it => {
+      if (lw + it.itemW > barW && line.length > 0) { lines.push(line); line = []; lw = 0; }
+      line.push(it); lw += it.itemW + colGap;
+    });
+    if (line.length > 0) lines.push(line);
 
-    items.forEach(item => {
-      ctx.fillStyle = item.color;
-      ctx.beginPath();
-      ctx.roundRect(lx, legendY - 7, 8, 8, 2);
-      ctx.fill();
-      ctx.fillStyle = '#374151';
-      ctx.textAlign = 'left';
-      ctx.fillText(item.label, lx + 12, legendY);
-      lx += item.itemW + 10;
+    lines.forEach((ln, li) => {
+      const totalW = ln.reduce((s, it) => s + it.itemW, 0) + (ln.length - 1) * colGap;
+      let lx = (barW - totalW) / 2;
+      ln.forEach(it => {
+        const ly = legendBaseY + li * lineH;
+        ctx.fillStyle = it.color;
+        ctx.beginPath(); ctx.roundRect(lx, ly - 7, 8, 8, 2); ctx.fill();
+        ctx.fillStyle = '#374151'; ctx.textAlign = 'left';
+        ctx.fillText(it.label, lx + 10, ly);
+        lx += it.itemW + colGap;
+      });
     });
   }
 
-  // Footer
-  const footerY = H - 14;
-  ctx.strokeStyle = '#f3f4f6';
-  ctx.lineWidth = 1;
-  ctx.beginPath();
-  ctx.moveTo(16, footerY - 6);
-  ctx.lineTo(W - 16, footerY - 6);
-  ctx.stroke();
-
-  ctx.fillStyle = '#c4b5fd';
-  ctx.font = `italic ${isMobile ? 8 : 9}px sans-serif`;
-  ctx.textAlign = 'left';
-  ctx.fillText('✨ Généré par Candi-date 2027', 16, footerY + 5);
-
+  // Footer — juste candi-date.fr
+  const footerY = H - 6;
+  ctx.strokeStyle = '#ececec'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(0, footerY - 8); ctx.lineTo(W, footerY - 8); ctx.stroke();
   ctx.fillStyle = '#a78bfa';
-  ctx.font = `bold ${isMobile ? 9 : 10}px Georgia, serif`;
+  ctx.font = `bold ${isMobile ? 8 : 9}px Georgia, serif`;
   ctx.textAlign = 'right';
-  ctx.fillText('candi-date.fr', W - 16, footerY + 5);
+  ctx.fillText('candi-date.fr', W, footerY);
 }
 
 function shareFrise() {
@@ -701,15 +687,12 @@ function showVictory(winner) {
   document.getElementById('victoryDesc').textContent = winner.desc;
   const badge = document.getElementById('victoryBadge');
   badge.textContent = winner.cat;
-  badge.setAttribute('style', getBadgeStyle(winner.color) + ' margin:0 auto 1.5rem; display:inline-block;');
+  badge.setAttribute('style', getBadgeStyle(winner.color));
   document.getElementById('progressFill').style.width  = '100%';
   document.getElementById('progressLabel').textContent = '✓ Tous les duels terminés';
-
-  // Draw frise
   const friseCanvas = document.getElementById('friseCanvas');
   const isMobile = window.innerWidth < 769;
   drawFrise(friseCanvas, winner, isMobile);
-
   launchConfetti();
 }
 
