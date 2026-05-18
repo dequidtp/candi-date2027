@@ -42,6 +42,53 @@
     </div>
   </header>
 
+  <!-- MODE SELECTION -->
+  <div class="mode-overlay" id="modeOverlay">
+    <div class="mode-card">
+      <div class="mode-header">
+        <div class="mode-logo">🗳️</div>
+        <h2 class="mode-title">Candi-date 2027</h2>
+        <p class="mode-subtitle">Comment voulez-vous jouer ?</p>
+      </div>
+      <div class="mode-options" id="modeOptions">
+        <button class="mode-option" onclick="startSolo()">
+          <span class="mode-option-icon">🧑</span>
+          <span class="mode-option-label">Solo</span>
+          <span class="mode-option-sub">Jouez seul et partagez votre résultat</span>
+        </button>
+        <button class="mode-option" onclick="showMultiOptions()">
+          <span class="mode-option-icon">👥</span>
+          <span class="mode-option-label">Multijoueur</span>
+          <span class="mode-option-sub">Jouez avec vos amis et comparez vos frises</span>
+        </button>
+      </div>
+
+      <!-- Multijoueur options -->
+      <div id="multiOptions" style="display:none" class="multi-options">
+        <div class="multi-section">
+          <p class="multi-section-title">Créer un salon</p>
+          <div class="multi-form">
+            <input id="modeNickname" type="text" maxlength="30" placeholder="Votre pseudo…"
+              onkeydown="if(event.key==='Enter') createSalonAndStart()" />
+            <button class="btn btn-primary" id="modeCreateBtn" onclick="createSalonAndStart()">Créer et jouer →</button>
+          </div>
+        </div>
+        <div class="multi-divider">ou</div>
+        <div class="multi-section">
+          <p class="multi-section-title">Rejoindre un salon existant</p>
+          <div class="multi-form">
+            <input id="modeJoinCode" type="text" maxlength="6" placeholder="Code du salon…"
+              style="text-transform:uppercase;letter-spacing:3px"
+              oninput="this.value=this.value.toUpperCase()"
+              onkeydown="if(event.key==='Enter') joinSalonFromMode()" />
+            <button class="btn btn-ghost" onclick="joinSalonFromMode()">Rejoindre →</button>
+          </div>
+        </div>
+        <button class="btn btn-ghost mode-back-btn" onclick="showModeOptions()">← Retour</button>
+      </div>
+    </div>
+  </div>
+
   <main class="game-main" id="gameArea">
     <div class="game-header">
       <h1 class="game-title">Pour qui voteriez-vous ?</h1>

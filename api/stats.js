@@ -11,9 +11,14 @@ module.exports = async (req, res) => {
   const SUPABASE_URL = process.env.SUPABASE_URL;
   const SUPABASE_KEY = process.env.SUPABASE_SERVICE_KEY;
 
+  const { origin } = req.query; // 'solo', 'salon', or undefined for all
+  const ALLOWED_ORIGINS = ['solo', 'salon'];
+  const safeOrigin = ALLOWED_ORIGINS.includes(origin) ? origin : null;
+
   try {
-    // Count total games
-    const gamesRes = await fetch(`${SUPABASE_URL}/rest/v1/games?select=id`, {
+    // Count games (filtered by origin if specified)
+    const originFilter = safeOrigin ? `&origin=eq.${safeOrigin}` : '';
+    const gamesRes = await fetch(`${SUPABASE_URL}/rest/v1/games?select=id${originFilter}`, {
       headers: {
         'apikey': SUPABASE_KEY,
         'Authorization': `Bearer ${SUPABASE_KEY}`,
@@ -23,9 +28,14 @@ module.exports = async (req, res) => {
     });
     const totalGames = parseInt(gamesRes.headers.get('content-range')?.split('/')[1] || '0');
 
+    // Choose view based on origin filter
+    const viewName = safeOrigin === 'solo'  ? 'stats_summary_solo'
+                   : safeOrigin === 'salon' ? 'stats_summary_salon'
+                   : 'stats_summary';
+
     // Get aggregated stats from view
     const statsRes = await fetch(
-      `${SUPABASE_URL}/rest/v1/stats_summary?select=candidate_name,total_wins,final_wins,total_weighted_score`,
+      `${SUPABASE_URL}/rest/v1/${viewName}?select=candidate_name,total_wins,final_wins,total_weighted_score`,
       {
         headers: {
           'apikey': SUPABASE_KEY,
@@ -53,7 +63,7 @@ module.exports = async (req, res) => {
         : 0
     }));
 
-    return res.status(200).json({ totalGames, candidates });
+    return res.status(200).json({ totalGames, candidates, origin: safeOrigin || 'all' });
 
   } catch (e) {
     console.error('Error:', e);

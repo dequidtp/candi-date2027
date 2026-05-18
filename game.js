@@ -664,7 +664,9 @@ function restartGame() {
   sessionStorage.removeItem('salonCode');
   currentGameId  = null;
   salonSubmitted = false;
-  startGame();
+  document.getElementById('victoryScreen').style.display = 'none';
+  document.getElementById('returnToSalonBtn').style.display = 'none';
+  showModeOverlay();
 }
 
 // ── Frise ─────────────────────────────────────────────────────
@@ -938,12 +940,16 @@ async function createSalonFromShare() {
     const createRes = await fetch(`${BACKEND_URL}/api/salon/create`, {
       method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}'
     });
-    const { code } = await createRes.json();
+    if (!createRes.ok) throw new Error('Erreur création salon');
+    const createData = await createRes.json();
+    if (!createData.code) throw new Error('Code salon manquant');
+    const { code } = createData;
 
     const joinRes = await fetch(`${BACKEND_URL}/api/salon/join`, {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ code, nickname })
     });
+    if (!joinRes.ok) throw new Error('Erreur rejoindre salon');
     const { token } = await joinRes.json();
 
     await fetch(`${BACKEND_URL}/api/salon/complete`, {
@@ -993,6 +999,78 @@ function copySalonLinkShare() {
   });
 }
 
+// ── Mode selection ────────────────────────────────────────────
+function showModeOverlay() {
+  document.getElementById('modeOverlay').style.display = 'flex';
+  showModeOptions();
+}
+
+function hideModeOverlay() {
+  document.getElementById('modeOverlay').style.display = 'none';
+}
+
+function showModeOptions() {
+  document.getElementById('modeOptions').style.display  = 'flex';
+  document.getElementById('multiOptions').style.display = 'none';
+}
+
+function showMultiOptions() {
+  document.getElementById('modeOptions').style.display  = 'none';
+  document.getElementById('multiOptions').style.display = 'flex';
+  document.getElementById('modeNickname').focus();
+}
+
+function startSolo() {
+  hideModeOverlay();
+  startGame();
+}
+
+async function createSalonAndStart() {
+  const nickname = document.getElementById('modeNickname').value.trim();
+  if (!nickname) { document.getElementById('modeNickname').focus(); return; }
+
+  const btn = document.getElementById('modeCreateBtn');
+  btn.disabled = true; btn.textContent = 'Création…';
+
+  try {
+    const createRes = await fetch(`${BACKEND_URL}/api/salon/create`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}'
+    });
+    if (!createRes.ok) throw new Error('Erreur création salon');
+    const createData = await createRes.json();
+    if (!createData.code) throw new Error('Code salon manquant');
+    const { code } = createData;
+
+    const joinRes = await fetch(`${BACKEND_URL}/api/salon/join`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code, nickname })
+    });
+    if (!joinRes.ok) throw new Error('Erreur rejoindre salon');
+    const { token } = await joinRes.json();
+
+    localStorage.setItem(`salon_${code}_token`, token);
+    sessionStorage.setItem('salonToken', token);
+    sessionStorage.setItem('salonCode', code);
+
+    hideModeOverlay();
+    startGame();
+  } catch (e) {
+    btn.disabled = false; btn.textContent = 'Créer et jouer →';
+  }
+}
+
+function joinSalonFromMode() {
+  const code = document.getElementById('modeJoinCode').value.trim().toUpperCase();
+  if (code.length < 4) { document.getElementById('modeJoinCode').focus(); return; }
+  window.location.href = `/salon.html?code=${code}`;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
-  if (document.getElementById('cardLeft')) startGame();
+  if (!document.getElementById('cardLeft')) return;
+  // If already in salon context (redirected from salon page), skip mode selection
+  if (sessionStorage.getItem('salonCode')) {
+    startGame();
+  } else {
+    showModeOverlay();
+  }
 });

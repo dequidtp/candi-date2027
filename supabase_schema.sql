@@ -72,14 +72,40 @@ ALTER TABLE games
   ADD CONSTRAINT IF NOT EXISTS fk_games_salon_player
   FOREIGN KEY (salon_player_id) REFERENCES salon_players(id);
 
--- Vue de synthèse (utile pour consulter dans l'interface Supabase)
+-- Vue de synthèse globale
 CREATE VIEW stats_summary AS
 SELECT
   gv.candidate_name,
-  SUM(gv.wins_in_game)                                    AS total_wins,
-  COUNT(*)  FILTER (WHERE gv.is_final_winner = true)      AS final_wins,
-  COUNT(DISTINCT gv.game_id)                              AS games_appeared,
-  ROUND(SUM(gv.wins_in_game)::numeric / NULLIF((SELECT COUNT(*) FROM games), 0), 2) AS avg_wins_per_game
+  SUM(gv.wins_in_game)                               AS total_wins,
+  COUNT(*) FILTER (WHERE gv.is_final_winner = true)  AS final_wins,
+  SUM(gv.weighted_score)                             AS total_weighted_score,
+  COUNT(DISTINCT gv.game_id)                         AS games_appeared
 FROM game_votes gv
+GROUP BY gv.candidate_name
+ORDER BY total_wins DESC;
+
+-- Vue stats parties solo uniquement
+CREATE VIEW stats_summary_solo AS
+SELECT
+  gv.candidate_name,
+  SUM(gv.wins_in_game)                               AS total_wins,
+  COUNT(*) FILTER (WHERE gv.is_final_winner = true)  AS final_wins,
+  SUM(gv.weighted_score)                             AS total_weighted_score
+FROM game_votes gv
+JOIN games g ON g.id = gv.game_id
+WHERE g.origin = 'solo'
+GROUP BY gv.candidate_name
+ORDER BY total_wins DESC;
+
+-- Vue stats parties salon uniquement
+CREATE VIEW stats_summary_salon AS
+SELECT
+  gv.candidate_name,
+  SUM(gv.wins_in_game)                               AS total_wins,
+  COUNT(*) FILTER (WHERE gv.is_final_winner = true)  AS final_wins,
+  SUM(gv.weighted_score)                             AS total_weighted_score
+FROM game_votes gv
+JOIN games g ON g.id = gv.game_id
+WHERE g.origin = 'salon'
 GROUP BY gv.candidate_name
 ORDER BY total_wins DESC;
