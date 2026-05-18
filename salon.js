@@ -19,8 +19,12 @@ let assignments      = {};   // { player_id: guessed_nickname }
 let revealed         = false;
 
 // ── Init ──────────────────────────────────────────────────────
+function isValidCode(code) {
+  return code && code.length >= 4 && /^[A-Z0-9]+$/.test(code);
+}
+
 async function init() {
-  if (!salonCode) { showState('enterCode'); return; }
+  if (!isValidCode(salonCode)) { showState('enterCode'); return; }
 
   const data = await fetchSalonInfo();
   if (!data) { showState('notFound'); return; }
