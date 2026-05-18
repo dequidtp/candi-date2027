@@ -36,17 +36,20 @@ module.exports = async (req, res) => {
 
     const games = await gameRes.json();
     const gameId = games[0]?.id;
-
     if (!gameId) return res.status(500).json({ error: 'No game ID returned' });
 
-    // 2. Insert votes
-    const rows = votes.map(v => ({
-      game_id: gameId,
-      candidate_name: v.candidate_name,
-      wins_in_game: v.wins_in_game || 0,
-      is_final_winner: v.is_final_winner || false,
-      opponents: v.opponents || []
-    }));
+    // 2. Insert votes (only candidates who participated)
+    const rows = votes
+      .filter(v => v.wins_in_game > 0 || v.is_final_winner)
+      .map(v => ({
+        game_id:        gameId,
+        candidate_name: v.candidate_name,
+        wins_in_game:   v.wins_in_game   || 0,
+        is_final_winner:v.is_final_winner || false,
+        opponents:      v.opponents      || [],
+        duel_numbers:   v.duel_numbers   || [],
+        weighted_score: v.weighted_score  || 0
+      }));
 
     const votesRes = await fetch(`${SUPABASE_URL}/rest/v1/game_votes`, {
       method: 'POST',
