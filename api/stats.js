@@ -1,5 +1,5 @@
 // api/stats.js — GET /api/stats
-// Uses fetch directly instead of supabase-js to avoid WebSocket issues on Node 20
+// Uses Supabase REST API with aggregation to avoid the 1000 row limit
 
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -12,8 +12,24 @@ module.exports = async (req, res) => {
   const SUPABASE_KEY = process.env.SUPABASE_SERVICE_KEY;
 
   try {
+    // Count total games
+    const gamesResponse = await fetch(
+      `${SUPABASE_URL}/rest/v1/games?select=id`,
+      {
+        headers: {
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${SUPABASE_KEY}`,
+          'Prefer': 'count=exact',
+          'Range': '0-0',
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+    const totalGames = parseInt(gamesResponse.headers.get('content-range')?.split('/')[1] || '0');
+
+    // Use the stats_summary view which aggregates server-side — no row limit issue
     const response = await fetch(
-      `${SUPABASE_URL}/rest/v1/game_votes?select=candidate_name,wins_in_game,is_final_winner`,
+      `${SUPABASE_URL}/rest/v1/stats_summary?select=candidate_name,total_wins,final_wins`,
       {
         headers: {
           'apikey': SUPABASE_KEY,
@@ -31,35 +47,12 @@ module.exports = async (req, res) => {
 
     const data = await response.json();
 
-    // Count total games
-    const gamesResponse = await fetch(
-      `${SUPABASE_URL}/rest/v1/games?select=id`,
-      {
-        headers: {
-          'apikey': SUPABASE_KEY,
-          'Authorization': `Bearer ${SUPABASE_KEY}`,
-          'Prefer': 'count=exact',
-          'Content-Type': 'application/json'
-        }
-      }
-    );
-
-    const totalGames = parseInt(gamesResponse.headers.get('content-range')?.split('/')[1] || '0');
-
-    // Aggregate
-    const agg = {};
-    data.forEach(({ candidate_name, wins_in_game, is_final_winner }) => {
-      if (!agg[candidate_name]) agg[candidate_name] = { total_wins: 0, final_wins: 0 };
-      agg[candidate_name].total_wins += wins_in_game || 0;
-      if (is_final_winner) agg[candidate_name].final_wins += 1;
-    });
-
-    const candidates = Object.entries(agg).map(([candidate_name, v]) => ({
-      candidate_name,
-      total_wins: v.total_wins,
-      final_wins: v.final_wins,
+    const candidates = data.map(row => ({
+      candidate_name: row.candidate_name,
+      total_wins:     row.total_wins     || 0,
+      final_wins:     row.final_wins     || 0,
       avg_wins_per_game: totalGames > 0
-        ? parseFloat((v.total_wins / totalGames).toFixed(2))
+        ? parseFloat(((row.total_wins || 0) / totalGames).toFixed(2))
         : 0
     }));
 
