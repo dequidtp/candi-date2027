@@ -18,8 +18,12 @@
     }
   ],
   "routes": [
-    { "src": "/api/game",  "dest": "/api/game.js"  },
-    { "src": "/api/stats", "dest": "/api/stats.js" },
-    { "src": "/(.*)",      "dest": "/$1"           }
+    { "src": "/api/game",            "dest": "/api/game.js"            },
+    { "src": "/api/stats",           "dest": "/api/stats.js"           },
+    { "src": "/api/salon/create",    "dest": "/api/salon-create.js"    },
+    { "src": "/api/salon/join",      "dest": "/api/salon-join.js"      },
+    { "src": "/api/salon/complete",  "dest": "/api/salon-complete.js"  },
+    { "src": "/api/salon/info",      "dest": "/api/salon-info.js"      },
+    { "src": "/(.*)",                "dest": "/$1"                     }
   ]
 }

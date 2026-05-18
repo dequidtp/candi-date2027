@@ -238,6 +238,8 @@ let gameVotes      = {};
 let history        = [];
 let profileScore   = {}; // tag → score
 let duelNumber     = 0;  // current duel index (1-based)
+let currentGameId  = null;
+let salonSubmitted = false;
 
 // ── Helpers ───────────────────────────────────────────────────
 function shuffle(arr) {
@@ -542,12 +544,38 @@ async function submitGameResult(winner) {
   saveLocal(payload, winner);
 
   try {
-    await fetch(`${BACKEND_URL}/api/game`, {
+    const res = await fetch(`${BACKEND_URL}/api/game`, {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
       body:    JSON.stringify(payload)
     });
+    const data = await res.json();
+    currentGameId = data.game_id || null;
   } catch (e) {}
+
+  // If playing inside a salon, submit completion silently
+  const salonToken = sessionStorage.getItem('salonToken');
+  const salonCode  = sessionStorage.getItem('salonCode');
+  if (salonToken && salonCode && currentGameId && !salonSubmitted) {
+    salonSubmitted = true;
+    try {
+      await fetch(`${BACKEND_URL}/api/salon/complete`, {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          token:          salonToken,
+          game_id:        currentGameId,
+          frise_segments: buildFriseSegments(winner),
+          winner_name:    winner.name,
+          winner_color:   winner.color,
+          winner_desc:    winner.desc,
+          winner_cat:     winner.cat
+        })
+      });
+      localStorage.setItem(`salon_${salonCode}_completed`, 'true');
+      localStorage.setItem(`salon_${salonCode}_winner`, winner.name);
+    } catch (e) {}
+  }
 }
 
 // ── Local storage ─────────────────────────────────────────────
@@ -608,6 +636,14 @@ function showVictory(winner) {
   const friseCanvas = document.getElementById('friseCanvas');
   drawFrise(friseCanvas, winner, window.innerWidth < 769);
   launchConfetti();
+
+  // Salon context: show "Retourner au salon" button
+  const salonCode = sessionStorage.getItem('salonCode');
+  const returnBtn = document.getElementById('returnToSalonBtn');
+  if (salonCode && returnBtn) {
+    returnBtn.style.display = 'inline-flex';
+    returnBtn.onclick = () => { window.location.href = `/salon.html?code=${salonCode}`; };
+  }
 }
 
 // ── Confetti ──────────────────────────────────────────────────
@@ -623,10 +659,18 @@ function launchConfetti() {
   }
 }
 
-function restartGame() { startGame(); }
+function restartGame() {
+  sessionStorage.removeItem('salonToken');
+  sessionStorage.removeItem('salonCode');
+  currentGameId  = null;
+  salonSubmitted = false;
+  startGame();
+}
 
 // ── Frise ─────────────────────────────────────────────────────
-function buildFriseSegments() {
+// winnerOverride lets us compute segments before currentWinner is set (e.g. in submitGameResult)
+function buildFriseSegments(winnerOverride) {
+  const winner = winnerOverride !== undefined ? winnerOverride : currentWinner;
   const segs = [];
   let currentName = null, currentColor = null, count = 0;
   history.forEach(entry => {
@@ -636,10 +680,10 @@ function buildFriseSegments() {
       currentName = w.name; currentColor = w.color; count = 1;
     } else { count++; }
   });
-  if (currentWinner) {
-    if (currentWinner.name !== currentName) {
+  if (winner) {
+    if (winner.name !== currentName) {
       if (currentName) segs.push({ name: currentName, color: currentColor, wins: count });
-      segs.push({ name: currentWinner.name, color: currentWinner.color, wins: 1 });
+      segs.push({ name: winner.name, color: winner.color, wins: 1 });
     } else {
       segs.push({ name: currentName, color: currentColor, wins: count + 1 });
     }
@@ -776,7 +820,9 @@ function downloadFrise(canvas) {
 }
 
 // ── Share ─────────────────────────────────────────────────────
-let shareMode = 'reveal';
+let shareMode      = 'reveal';
+let currentSalonCode = null;
+let currentSalonUrl  = null;
 
 function openSharePanel() {
   if (!currentWinner) return;
@@ -786,6 +832,17 @@ function openSharePanel() {
   setPhoto(imgEl, avatarEl, currentWinner);
   avatarEl.style.width = '22px'; avatarEl.style.height = '22px'; avatarEl.style.fontSize = '8px';
   document.getElementById('previewName').textContent = currentWinner.name;
+
+  // Reset salon state
+  currentSalonCode = null;
+  currentSalonUrl  = null;
+  const nickInput = document.getElementById('shareSalonNickname');
+  if (nickInput) nickInput.value = '';
+  const createBtn = document.getElementById('shareSalonCreateBtn');
+  if (createBtn) { createBtn.disabled = false; createBtn.textContent = 'Créer le salon →'; }
+  const salonResult = document.getElementById('salonResultWrap');
+  if (salonResult) salonResult.style.display = 'none';
+
   selectShareOption('reveal');
   document.getElementById('shareOverlay').style.display = 'flex';
   document.getElementById('copyConfirm').classList.remove('visible');
@@ -796,12 +853,27 @@ function closeSharePanelOutside(e) { if (e.target === document.getElementById('s
 
 function selectShareOption(mode) {
   shareMode = mode;
-  ['optReveal','optSecret'].forEach(id => document.getElementById(id).classList.remove('selected'));
-  ['radioReveal','radioSecret'].forEach(id => { const el=document.getElementById(id); el.classList.remove('active'); el.innerHTML=''; });
-  const sel = mode==='reveal' ? 'optReveal' : 'optSecret';
-  const radio = mode==='reveal' ? 'radioReveal' : 'radioSecret';
-  document.getElementById(sel).classList.add('selected');
-  const r = document.getElementById(radio); r.classList.add('active'); r.innerHTML='<div class="share-option-dot"></div>';
+  ['optReveal','optSecret','optSalon'].forEach(id => { const el = document.getElementById(id); if (el) el.classList.remove('selected'); });
+  ['radioReveal','radioSecret','radioSalon'].forEach(id => { const el = document.getElementById(id); if (el) { el.classList.remove('active'); el.innerHTML = ''; } });
+
+  const selId   = mode === 'reveal' ? 'optReveal'   : mode === 'secret' ? 'optSecret'   : 'optSalon';
+  const radioId = mode === 'reveal' ? 'radioReveal' : mode === 'secret' ? 'radioSecret' : 'radioSalon';
+  document.getElementById(selId)?.classList.add('selected');
+  const r = document.getElementById(radioId);
+  if (r) { r.classList.add('active'); r.innerHTML = '<div class="share-option-dot"></div>'; }
+
+  const isSalon = mode === 'salon';
+  const normalBtns    = document.getElementById('normalShareButtons');
+  const salonNickWrap = document.getElementById('salonNicknameWrap');
+  const salonResult   = document.getElementById('salonResultWrap');
+  const subtitle      = document.getElementById('shareSubtitle');
+
+  if (normalBtns)    normalBtns.style.display    = isSalon ? 'none' : 'flex';
+  if (salonNickWrap) salonNickWrap.style.display  = isSalon && !currentSalonCode ? 'flex' : 'none';
+  if (salonResult)   salonResult.style.display    = isSalon && currentSalonCode  ? 'flex' : 'none';
+  if (subtitle)      subtitle.textContent         = isSalon
+    ? 'Invitez vos amis à jouer et comparez vos résultats !'
+    : 'Voulez-vous révéler votre candidat à vos amis ?';
 }
 
 function buildShareText() {
@@ -852,6 +924,73 @@ function shareNative() {
     if (navigator.share) navigator.share({ title: 'Candi-date 2027', text: buildShareText(), url: window.location.href });
     else copyLink();
   }
+}
+
+// ── Salon creation (from share panel) ────────────────────────
+async function createSalonFromShare() {
+  const nickname = document.getElementById('shareSalonNickname').value.trim();
+  if (!nickname) { document.getElementById('shareSalonNickname').focus(); return; }
+
+  const btn = document.getElementById('shareSalonCreateBtn');
+  btn.disabled = true; btn.textContent = 'Création…';
+
+  try {
+    const createRes = await fetch(`${BACKEND_URL}/api/salon/create`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}'
+    });
+    const { code } = await createRes.json();
+
+    const joinRes = await fetch(`${BACKEND_URL}/api/salon/join`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code, nickname })
+    });
+    const { token } = await joinRes.json();
+
+    await fetch(`${BACKEND_URL}/api/salon/complete`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        token,
+        game_id:        currentGameId,
+        frise_segments: buildFriseSegments(currentWinner),
+        winner_name:    currentWinner.name,
+        winner_color:   currentWinner.color,
+        winner_desc:    currentWinner.desc,
+        winner_cat:     currentWinner.cat
+      })
+    });
+
+    localStorage.setItem(`salon_${code}_token`, token);
+    localStorage.setItem(`salon_${code}_completed`, 'true');
+    localStorage.setItem(`salon_${code}_winner`, currentWinner.name);
+
+    currentSalonCode = code;
+    currentSalonUrl  = `${window.location.origin}/salon.html?code=${code}`;
+
+    document.getElementById('salonResultCode').textContent = code;
+    document.getElementById('goToSalonBtn').href = currentSalonUrl;
+    document.getElementById('salonNicknameWrap').style.display = 'none';
+    document.getElementById('salonResultWrap').style.display   = 'flex';
+  } catch (e) {
+    btn.disabled = false; btn.textContent = 'Créer le salon →';
+  }
+}
+
+function shareSalonWhatsApp() {
+  const text = `J'ai joué à Candi-date 2027 ! Rejoins mon salon pour jouer et comparer nos résultats 🎮\n${currentSalonUrl}`;
+  if (navigator.canShare?.({ url: currentSalonUrl })) {
+    navigator.share({ title: 'Candi-date 2027 — Salon', text, url: currentSalonUrl })
+      .catch(() => window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank'));
+  } else {
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+  }
+}
+
+function copySalonLinkShare() {
+  navigator.clipboard.writeText(currentSalonUrl).then(() => {
+    const el = document.getElementById('copyConfirm');
+    el.classList.add('visible');
+    setTimeout(() => el.classList.remove('visible'), 2500);
+  });
 }
 
 document.addEventListener('DOMContentLoaded', () => {

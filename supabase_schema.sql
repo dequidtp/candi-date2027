@@ -27,6 +27,51 @@ CREATE INDEX idx_gv_final     ON game_votes (is_final_winner) WHERE is_final_win
 ALTER TABLE games      DISABLE ROW LEVEL SECURITY;
 ALTER TABLE game_votes DISABLE ROW LEVEL SECURITY;
 
+-- ============================================================
+-- Salons — v1
+-- ============================================================
+
+-- Ajouter l'origine et le lien salon sur les parties
+ALTER TABLE games
+  ADD COLUMN IF NOT EXISTS origin          TEXT DEFAULT 'solo' CHECK (origin IN ('solo','salon')),
+  ADD COLUMN IF NOT EXISTS salon_player_id uuid;
+
+-- Table des salons
+CREATE TABLE IF NOT EXISTS salons (
+  id         uuid        DEFAULT gen_random_uuid() PRIMARY KEY,
+  code       TEXT        NOT NULL UNIQUE,
+  created_at TIMESTAMPTZ DEFAULT now(),
+  expires_at TIMESTAMPTZ DEFAULT now() + interval '7 days'
+);
+
+-- Table des participants d'un salon
+CREATE TABLE IF NOT EXISTS salon_players (
+  id             uuid        DEFAULT gen_random_uuid() PRIMARY KEY,
+  salon_id       uuid        NOT NULL REFERENCES salons(id) ON DELETE CASCADE,
+  nickname       TEXT        NOT NULL,
+  token          TEXT        NOT NULL UNIQUE,
+  game_id        uuid        REFERENCES games(id),
+  winner_name    TEXT,
+  winner_color   TEXT,
+  winner_desc    TEXT,
+  winner_cat     TEXT,
+  frise_segments JSONB,
+  joined_at      TIMESTAMPTZ DEFAULT now(),
+  completed_at   TIMESTAMPTZ
+);
+
+CREATE INDEX IF NOT EXISTS idx_sp_salon   ON salon_players (salon_id);
+CREATE INDEX IF NOT EXISTS idx_sp_token   ON salon_players (token);
+CREATE INDEX IF NOT EXISTS idx_salons_code ON salons (code);
+
+ALTER TABLE salons        DISABLE ROW LEVEL SECURITY;
+ALTER TABLE salon_players DISABLE ROW LEVEL SECURITY;
+
+-- Référence FK ajoutée après création de salon_players
+ALTER TABLE games
+  ADD CONSTRAINT IF NOT EXISTS fk_games_salon_player
+  FOREIGN KEY (salon_player_id) REFERENCES salon_players(id);
+
 -- Vue de synthèse (utile pour consulter dans l'interface Supabase)
 CREATE VIEW stats_summary AS
 SELECT
