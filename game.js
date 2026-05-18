@@ -222,10 +222,11 @@ const MANDATORY_NAMES = [
   "Jean-Luc Mélenchon",
   "François Ruffin",
   "Dominique de Villepin",
-  "Édouard Philippe"
+  "Édouard Philippe",
+  "Marc Fesneau"
 ];
 
-const TOTAL_DUELS = 30;
+const TOTAL_DUELS = 34;
 
 // ── State ─────────────────────────────────────────────────────
 let queue          = [];
@@ -269,22 +270,21 @@ function candidateScore(candidate) {
   return (candidate.tags || []).reduce((s, tag) => s + (profileScore[tag] || 0), 0);
 }
 
-// ── Build initial queue of 30 candidates ─────────────────────
+// ── Build queue of 30 candidates ─────────────────────────────
 function buildQueue() {
-  const mandatory = CANDIDATES.filter(c => MANDATORY_NAMES.includes(c.name));
+  const mandatory = shuffle(CANDIDATES.filter(c => MANDATORY_NAMES.includes(c.name)));
   const others    = shuffle(CANDIDATES.filter(c => !MANDATORY_NAMES.includes(c.name)));
 
-  // Phase 1 (duels 1-10): balanced sample — pick ~2 from each major tag group
+  // Phase 1 (positions 0-9): balanced sample, no mandatory
   const tagGroups = {
-    extreme:       others.filter(c => c.tags.includes('extreme')),
-    droite:        others.filter(c => c.tags.includes('droite') && !c.tags.includes('extreme')),
-    centre:        others.filter(c => c.tags.includes('centre')),
-    gauche:        others.filter(c => c.tags.includes('gauche')),
-    expert:        others.filter(c => c.tags.includes('expert')),
-    media:         others.filter(c => c.tags.includes('media')),
-    sport:         others.filter(c => c.tags.includes('sport')),
-    business:      others.filter(c => c.tags.includes('business') && !c.tags.includes('expert')),
-    electron_libre:others.filter(c => c.tags.includes('electron_libre') && !c.tags.includes('media') && !c.tags.includes('sport') && !c.tags.includes('business') && !c.tags.includes('expert')),
+    extreme: others.filter(c => c.tags.includes('extreme')),
+    droite:  others.filter(c => c.tags.includes('droite') && !c.tags.includes('extreme')),
+    centre:  others.filter(c => c.tags.includes('centre')),
+    gauche:  others.filter(c => c.tags.includes('gauche')),
+    expert:  others.filter(c => c.tags.includes('expert')),
+    media:   others.filter(c => c.tags.includes('media')),
+    sport:   others.filter(c => c.tags.includes('sport')),
+    business:others.filter(c => c.tags.includes('business') && !c.tags.includes('expert')),
   };
 
   const phase1 = [];
@@ -302,64 +302,47 @@ function buildQueue() {
   pick(tagGroups.expert,  1);
   pick(tagGroups.media,   1);
   pick(tagGroups.sport,   1);
-
-  // Fill phase1 to 10 if needed
+  // Fill to 10
   for (const c of others) {
     if (phase1.length >= 10) break;
     if (!used.has(c.name)) { phase1.push(c); used.add(c.name); }
   }
 
-  // Remaining pool for phases 2 & 3
-  const remaining = others.filter(c => !used.has(c.name));
+  // Remaining pool for phases 2&3 (no mandatory)
+  const pool = others.filter(c => !used.has(c.name));
 
-  // Mandatory: place them in phase 2 (duels 11-20) and phase 3 (21-30)
-  // We'll insert them at fixed positions later
-  // For now build a pool of 25 non-mandatory for phases 2&3 (will be trimmed dynamically)
-  // Phase 2 will be filled dynamically based on profile
-  // Phase 3 = mandatory (5) + top 5 from remaining
+  // Build full queue of 30:
+  // Phase 1: positions 1-10 (indices 0-9) — from phase1
+  // Phase 2: positions 11-20 (indices 10-19) — profile-driven from pool (filled dynamically)
+  // Phase 3: positions 21-30 (indices 20-29) — mandatory (6) + top scorers (4)
+  // We pre-fill phase1 and leave phase2/3 to be filled dynamically
 
-  return {
-    phase1: shuffle(phase1),    // 10 candidates, random order
-    pool:   remaining,           // remaining ~65 candidates for phases 2&3
-    mandatory
-  };
+  return { phase1: shuffle(phase1), pool, mandatory };
 }
 
-// ── Dynamic queue ─────────────────────────────────────────────
-let gamePool      = [];   // remaining candidates not yet shown
-let gameMandatory = [];   // mandatory not yet shown
-let phase1Done    = false;
-let phase2Done    = false;
+let gamePool      = [];
+let gameMandatory = [];
+let gamePhase1    = [];
 
 function getNextChallenger() {
-  const duelsLeft = TOTAL_DUELS - duelNumber;
+  // Phase 1: duels 1-10
+  if (duelNumber <= 10 && gamePhase1.length > 0) {
+    return gamePhase1.shift();
+  }
 
-  // Phase 3 (last 10 duels): mandatory first, then top scorers
-  if (duelNumber >= 20) {
+  // Phase 3: duels 25-34 — inject mandatory first
+  if (duelNumber >= 25) {
     if (gameMandatory.length > 0) {
-      // Pick mandatory with highest profile score
       gameMandatory.sort((a, b) => candidateScore(b) - candidateScore(a));
       return gameMandatory.shift();
     }
-    // Then top scorers from pool
     gamePool.sort((a, b) => candidateScore(b) - candidateScore(a));
-    return gamePool.shift();
+    return gamePool.shift() || null;
   }
 
-  // Phase 2 (duels 11-19): profile-driven, no mandatory yet
-  if (duelNumber >= 10) {
-    // Keep mandatory for phase 3
-    const nonMandatory = gamePool.filter(c => !MANDATORY_NAMES.includes(c.name));
-    nonMandatory.sort((a, b) => candidateScore(b) - candidateScore(a));
-    const chosen = nonMandatory[0];
-    if (chosen) {
-      gamePool = gamePool.filter(c => c.name !== chosen.name);
-      return chosen;
-    }
-  }
-
-  // Phase 1: already pre-shuffled, just shift
-  return gamePool.shift();
+  // Phase 2: duels 11-24 — profile-driven, no mandatory
+  gamePool.sort((a, b) => candidateScore(b) - candidateScore(a));
+  return gamePool.shift() || null;
 }
 
 // ── Game start ────────────────────────────────────────────────
@@ -376,11 +359,12 @@ function startGame() {
   CANDIDATES.forEach(c => { gameVotes[c.name] = { wins: 0, opponents: [] }; });
 
   const { phase1, pool, mandatory } = buildQueue();
+  gamePhase1    = [...phase1];
   gameMandatory = [...mandatory];
-  gamePool      = [...phase1, ...pool]; // phase1 first, then rest
+  gamePool      = [...pool];
 
-  leftCandidate  = gamePool.shift();
-  rightCandidate = gamePool.shift();
+  leftCandidate  = gamePhase1.shift();
+  rightCandidate = gamePhase1.shift();
   duelNumber     = 1;
 
   // Preload first photos
@@ -465,7 +449,14 @@ function goBack() {
   gameVotes[prev.winner.name].wins = Math.max(0, (gameVotes[prev.winner.name].wins || 0) - 1);
   gameVotes[prev.winner.name].opponents.pop();
   // Restore state
-  gamePool.unshift(rightCandidate);
+  // Restore the challenger back to the right pool
+  if (prev.duelNumber <= 10) {
+    gamePhase1.unshift(rightCandidate);
+  } else if (prev.duelNumber >= 25 && MANDATORY_NAMES.includes(rightCandidate.name)) {
+    gameMandatory.unshift(rightCandidate);
+  } else {
+    gamePool.unshift(rightCandidate);
+  }
   leftCandidate  = prev.left;
   rightCandidate = prev.right;
   duelNumber     = prev.duelNumber;
