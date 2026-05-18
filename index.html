@@ -128,6 +128,7 @@
       <div class="victory-actions">
         <button class="btn btn-primary" onclick="restartGame()">🔄 Rejouer</button>
         <button class="btn btn-share" onclick="openSharePanel()">🔗 Partager</button>
+        <button class="btn btn-salon" id="returnToSalonBtn" style="display:none">👥 Retourner au salon</button>
       </div>
     </div>
   </div>
@@ -137,8 +138,8 @@
     <div class="share-panel">
       <button class="share-close" onclick="closeSharePanel()">✕</button>
       <h3 class="share-title">Partager le jeu</h3>
-      <p class="share-subtitle">Voulez-vous révéler votre candidat à vos amis ?</p>
-      <div class="share-options">
+      <p class="share-subtitle" id="shareSubtitle">Voulez-vous révéler votre candidat à vos amis ?</p>
+      <div class="share-options share-options-3">
         <div class="share-option selected" id="optReveal" onclick="selectShareOption('reveal')">
           <div class="share-option-radio active" id="radioReveal"><div class="share-option-dot"></div></div>
           <div class="share-option-icon">👁️</div>
@@ -162,8 +163,40 @@
             <div class="share-preview-ghost-name"></div>
           </div>
         </div>
+        <div class="share-option" id="optSalon" onclick="selectShareOption('salon')">
+          <div class="share-option-radio" id="radioSalon"></div>
+          <div class="share-option-icon">🎮</div>
+          <div class="share-option-label">Créer un salon</div>
+          <div class="share-option-sub">Comparez vos résultats avec vos amis</div>
+          <div class="share-preview share-preview-salon">
+            <span class="share-preview-salon-hint">Guessing · Révélation</span>
+          </div>
+        </div>
       </div>
-      <div class="share-buttons">
+
+      <!-- Salon : saisie pseudo -->
+      <div id="salonNicknameWrap" style="display:none" class="salon-share-form">
+        <input id="shareSalonNickname" type="text" maxlength="30" placeholder="Votre pseudo dans le salon…"
+          onkeydown="if(event.key==='Enter') createSalonFromShare()" />
+        <button class="btn btn-primary" id="shareSalonCreateBtn" onclick="createSalonFromShare()">Créer le salon →</button>
+      </div>
+
+      <!-- Salon : résultat après création -->
+      <div id="salonResultWrap" style="display:none" class="salon-share-result">
+        <div class="salon-share-result-code">
+          Code : <strong id="salonResultCode"></strong>
+        </div>
+        <div class="share-buttons">
+          <button class="btn btn-whatsapp" onclick="shareSalonWhatsApp()">💬 Partager sur WhatsApp</button>
+          <div class="share-buttons-row">
+            <button class="btn btn-ghost" onclick="copySalonLinkShare()">📋 Copier le lien</button>
+            <a id="goToSalonBtn" href="#" class="btn btn-salon">Voir le salon →</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Boutons partage normaux (reveal / secret) -->
+      <div id="normalShareButtons" class="share-buttons">
         <button class="btn btn-whatsapp" onclick="shareWhatsApp()">💬 Partager sur WhatsApp</button>
         <div class="share-buttons-row">
           <button class="btn btn-ghost" onclick="copyLink()">📋 Copier le lien</button>

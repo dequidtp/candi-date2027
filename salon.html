@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Salon · Candi-date 2027</title>
+  <meta name="description" content="Jouez avec vos amis et comparez vos candidats idéaux." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <a href="/" style="text-decoration:none;color:inherit;display:flex;align-items:center;gap:8px">
+          <span class="brand-flag">🗳️</span>
+          <span class="brand-title">Candi-date 2027</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main class="salon-main">
+
+    <!-- État : chargement -->
+    <div id="stateLoading" class="salon-state">
+      <div class="salon-spinner"></div>
+      <p>Chargement du salon…</p>
+    </div>
+
+    <!-- État : code manquant → saisir un code -->
+    <div id="stateEnterCode" class="salon-state" style="display:none">
+      <div class="salon-join-card">
+        <div class="salon-icon">🎮</div>
+        <h2>Rejoindre un salon</h2>
+        <p>Entrez le code à 6 caractères partagé par l'organisateur</p>
+        <div class="salon-join-form">
+          <input id="codeInput" type="text" maxlength="6" placeholder="Ex : BLEU42"
+            style="text-transform:uppercase;letter-spacing:4px;font-size:1.3rem;text-align:center"
+            oninput="this.value=this.value.toUpperCase()"
+            onkeydown="if(event.key==='Enter') goToSalon()" />
+          <button class="btn btn-primary" onclick="goToSalon()">Rejoindre →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- État : salon introuvable -->
+    <div id="stateNotFound" class="salon-state" style="display:none">
+      <div class="salon-join-card">
+        <div class="salon-icon">😕</div>
+        <h2>Salon introuvable</h2>
+        <p>Ce salon n'existe pas ou a expiré (durée de vie : 7 jours).</p>
+        <a href="/" class="btn btn-primary">Jouer en solo</a>
+      </div>
+    </div>
+
+    <!-- État : rejoindre (pas encore de token) -->
+    <div id="stateJoin" class="salon-state" style="display:none">
+      <div class="salon-join-card">
+        <div class="salon-code-badge" id="joinCodeBadge"></div>
+        <div class="salon-icon">👤</div>
+        <h2>Rejoindre le salon</h2>
+        <p>Choisissez un pseudo pour participer</p>
+        <div class="salon-join-form">
+          <input id="nicknameInput" type="text" maxlength="30" placeholder="Votre pseudo…"
+            onkeydown="if(event.key==='Enter') joinAndPlay()" />
+          <button class="btn btn-primary" onclick="joinAndPlay()">Jouer →</button>
+        </div>
+        <p class="salon-hint">Vous serez redirigé vers le jeu, puis vos résultats apparaîtront ici.</p>
+      </div>
+    </div>
+
+    <!-- État : token présent mais pas encore joué -->
+    <div id="stateWaiting" class="salon-state" style="display:none">
+      <div class="salon-join-card">
+        <div class="salon-code-badge" id="waitingCodeBadge"></div>
+        <div class="salon-icon">⏳</div>
+        <h2>À vous de jouer !</h2>
+        <p>Vous avez rejoint le salon. Jouez pour que vos résultats apparaissent dans le récap.</p>
+        <button class="btn btn-primary" onclick="startPlay()">Jouer maintenant →</button>
+        <div id="waitingPlayerList" class="salon-player-list-mini"></div>
+      </div>
+    </div>
+
+    <!-- État : récap (au moins terminé sa partie) -->
+    <div id="stateRecap" class="salon-state" style="display:none">
+
+      <!-- En-tête récap -->
+      <div class="recap-header">
+        <div>
+          <h2 class="recap-title">Salon <span class="salon-code-badge" id="recapCodeBadge"></span></h2>
+          <p class="recap-subtitle" id="recapSubtitle"></p>
+        </div>
+        <div class="recap-header-actions">
+          <button class="btn btn-ghost" onclick="refreshSalon()" id="refreshBtn">↻ Rafraîchir</button>
+          <button class="btn btn-ghost" onclick="copySalonLink()" id="copyLinkBtn">📋 Partager le salon</button>
+        </div>
+      </div>
+
+      <!-- Phase guessing -->
+      <div id="guessPhase">
+        <div class="guess-instructions">
+          <p>🕵️ <strong>À vous de deviner !</strong> Associez chaque frise à son auteur, puis révélez les vraies réponses.</p>
+        </div>
+
+        <!-- Chips de noms (à assigner) -->
+        <div class="name-chips-wrap">
+          <p class="chips-label">Noms à assigner :</p>
+          <div class="name-chips" id="nameChips"></div>
+        </div>
+
+        <!-- Grille de frises anonymes -->
+        <div class="frises-grid" id="frisesGrid"></div>
+
+        <div class="reveal-bar">
+          <button class="btn btn-reveal-all" id="revealAllBtn" onclick="revealAll()">
+            ✨ Révéler toutes les réponses
+          </button>
+          <p class="reveal-hint" id="revealHint"></p>
+        </div>
+      </div>
+
+      <!-- En attente d'autres joueurs -->
+      <div id="pendingSection" style="display:none" class="pending-section">
+        <h3>En attente</h3>
+        <div id="pendingList" class="salon-player-list-mini"></div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Overlay copie confirmée -->
+  <div class="copy-toast" id="copyToast">✓ Lien copié !</div>
+
+  <script src="salon.js"></script>
+</body>
+</html>

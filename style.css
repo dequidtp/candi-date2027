@@ -313,9 +313,146 @@ body::before { content: ''; position: fixed; inset: 0; pointer-events: none; z-i
   .game-main { padding: 1rem .8rem 5rem; }
   .topbar-inner { padding: .6rem 1rem; }
   .share-options { grid-template-columns: 1fr 1fr; }
+  .share-options-3 { grid-template-columns: repeat(3, 1fr) !important; }
+  .share-option { padding: .65rem .5rem; }
+  .share-option-label { font-size: .75rem; }
+  .share-option-sub { font-size: .65rem; }
+  .share-option-icon { font-size: 1.2rem; }
 }
 .desktop-only { display: flex; align-items: center; gap: .5rem; }
 .prev-btn { opacity: 0.3; pointer-events: none; transition: opacity .2s; }
 .prev-btn.visible { opacity: 1; pointer-events: auto; }
 @media (min-width: 769px) { .mobile-bar { display: none; } }
 @media (max-width: 768px) { .desktop-only { display: none; } }
+
+/* ══════════════════════════════════════════════════
+   SALON
+══════════════════════════════════════════════════ */
+
+/* Button */
+.btn-salon { background: var(--green-soft); color: #166534; border: 1.5px solid var(--green); }
+.btn-salon:hover { background: var(--green); color: #fff; }
+
+/* Share panel — 3 options */
+.share-options-3 { grid-template-columns: repeat(3, 1fr) !important; }
+.share-preview-salon { justify-content: center; }
+.share-preview-salon-hint { font-size: .7rem; color: #5b21b6; font-weight: 600; text-align: center; }
+
+/* Salon share form (inside share panel) */
+.salon-share-form { display: flex; flex-direction: column; gap: .55rem; margin-bottom: .85rem; }
+.salon-share-form input { padding: .6rem 1rem; border-radius: var(--radius-pill); border: 1.5px solid var(--border); font-family: var(--font-b); font-size: .9rem; outline: none; background: var(--bg); }
+.salon-share-form input:focus { border-color: var(--purple); background: var(--card); }
+.salon-share-result { display: flex; flex-direction: column; gap: .65rem; margin-bottom: .5rem; }
+.salon-share-result-code { text-align: center; font-size: .9rem; color: var(--muted); }
+.salon-share-result-code strong { font-family: var(--font-d); font-size: 1.4rem; letter-spacing: 4px; color: var(--navy); }
+
+/* Victory screen — salon creation inline */
+.create-salon-section { margin-top: 1rem; padding: 1rem 1.25rem; background: var(--bg); border-radius: 14px; border: 1.5px dashed var(--border); text-align: left; }
+.salon-create-label { font-size: .8rem; color: var(--muted); font-weight: 600; margin-bottom: .6rem; }
+.salon-create-form { display: flex; gap: .5rem; flex-wrap: wrap; }
+.salon-create-form input { flex: 1; min-width: 120px; padding: .5rem .9rem; border-radius: var(--radius-pill); border: 1.5px solid var(--border); font-family: var(--font-b); font-size: .85rem; outline: none; background: var(--card); }
+.salon-create-form input:focus { border-color: var(--purple); }
+.salon-created-label { font-size: .82rem; color: var(--muted); margin-bottom: .5rem; font-weight: 600; }
+.salon-created-link { display: flex; align-items: center; gap: .75rem; margin-bottom: .75rem; flex-wrap: wrap; }
+.salon-created-code { font-family: var(--font-d); font-size: 1.5rem; font-weight: 900; letter-spacing: 4px; color: var(--navy); }
+.salon-copy-btn { font-size: .78rem !important; }
+.salon-go-btn { font-size: .85rem; }
+
+/* Page salon principale */
+.salon-main { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: 5rem 1rem 4rem; gap: 2rem; }
+
+.salon-state { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; gap: 1rem; }
+
+/* Spinner */
+.salon-spinner { width: 36px; height: 36px; border: 3px solid var(--border); border-top-color: var(--purple); border-radius: 50%; animation: spin .8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Join card */
+.salon-join-card { background: var(--card); border-radius: 24px; box-shadow: var(--shadow); padding: 2.5rem 2rem; max-width: 440px; width: 100%; text-align: center; }
+.salon-join-card h2 { font-family: var(--font-d); font-size: 1.6rem; font-weight: 900; margin-bottom: .4rem; }
+.salon-join-card p { color: var(--muted); font-size: .88rem; margin-bottom: 1.25rem; line-height: 1.5; }
+.salon-icon { font-size: 2.5rem; margin-bottom: .5rem; }
+.salon-code-badge { display: inline-block; font-family: var(--font-d); font-size: 1rem; font-weight: 900; letter-spacing: 4px; background: var(--purple-soft); color: var(--purple); padding: .25rem .8rem; border-radius: var(--radius-pill); margin-bottom: .75rem; }
+.salon-join-form { display: flex; flex-direction: column; gap: .6rem; margin-bottom: 1rem; }
+.salon-join-form input { padding: .7rem 1.1rem; border-radius: var(--radius-pill); border: 1.5px solid var(--border); font-family: var(--font-b); font-size: .95rem; outline: none; background: var(--bg); }
+.salon-join-form input:focus { border-color: var(--purple); background: var(--card); }
+.salon-hint { font-size: .76rem; color: var(--muted); }
+
+/* Mini player list */
+.salon-player-list-mini { display: flex; flex-wrap: wrap; gap: .4rem; justify-content: center; margin-top: .5rem; }
+.player-chip { display: inline-flex; align-items: center; gap: .3rem; padding: .28rem .65rem; border-radius: var(--radius-pill); font-size: .78rem; font-weight: 500; }
+.player-chip.done    { background: var(--green-soft); color: #166534; border: 1px solid var(--green); }
+.player-chip.pending { background: var(--gold-soft); color: #92400e; border: 1px solid #fde68a; }
+
+/* Récap header */
+.recap-header { width: 100%; max-width: 900px; display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem; }
+.recap-title { font-family: var(--font-d); font-size: 1.5rem; font-weight: 900; margin-bottom: .2rem; }
+.recap-subtitle { color: var(--muted); font-size: .84rem; }
+.recap-header-actions { display: flex; gap: .5rem; flex-wrap: wrap; }
+
+/* Instructions guessing */
+.guess-instructions { background: var(--purple-soft); border-radius: 14px; padding: .85rem 1.2rem; max-width: 900px; width: 100%; margin-bottom: 1rem; }
+.guess-instructions p { color: #5b21b6; font-size: .88rem; line-height: 1.5; }
+
+/* Name chips */
+.name-chips-wrap { width: 100%; max-width: 900px; margin-bottom: 1.25rem; }
+.chips-label { font-size: .75rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; margin-bottom: .5rem; }
+.name-chips { display: flex; flex-wrap: wrap; gap: .45rem; }
+.name-chip { display: inline-flex; align-items: center; padding: .35rem .85rem; border-radius: var(--radius-pill); border: 1.5px solid var(--border); background: var(--card); font-family: var(--font-b); font-size: .82rem; font-weight: 500; cursor: pointer; transition: var(--t); color: var(--navy); }
+.name-chip:hover:not(:disabled) { border-color: var(--purple); background: var(--purple-soft); color: #5b21b6; }
+.name-chip.selected { background: var(--purple); border-color: var(--purple); color: #fff; transform: scale(1.04); }
+.name-chip.assigned { background: var(--green-soft); border-color: var(--green); color: #166534; }
+.name-chip:disabled { opacity: .45; cursor: default; }
+
+/* Frises grid */
+.frises-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.25rem; width: 100%; max-width: 900px; margin-bottom: 1.5rem; }
+
+/* Frise card */
+.frise-card { background: var(--card); border-radius: 18px; box-shadow: var(--shadow); overflow: hidden; border: 2px solid var(--border); transition: border-color .3s, box-shadow .3s; }
+.frise-card.card-correct  { border-color: var(--green); box-shadow: 0 0 0 3px rgba(134,239,172,.3), var(--shadow); }
+.frise-card.card-wrong    { border-color: var(--red); box-shadow: 0 0 0 3px rgba(252,165,165,.3), var(--shadow); }
+.frise-card.card-unguessed { border-color: var(--border); opacity: .85; }
+
+.frise-anon-label { padding: .65rem 1rem .25rem; font-size: .72rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .07em; }
+.frise-canvas-wrap { padding: .25rem .75rem .5rem; }
+.frise-canvas-wrap canvas { display: block; width: 100%; }
+
+/* Frise card footer — assign zone */
+.frise-card-footer { padding: .5rem .75rem .85rem; }
+.frise-assign-slot { display: flex; align-items: center; justify-content: center; min-height: 36px; border: 2px dashed var(--border); border-radius: 10px; cursor: pointer; transition: var(--t); padding: .3rem .75rem; }
+.frise-assign-slot:hover { border-color: var(--purple); background: var(--purple-soft); }
+.assign-placeholder { font-size: .78rem; color: var(--muted); text-align: center; line-height: 1.4; }
+.assign-name { font-size: .85rem; font-weight: 600; color: var(--navy); display: flex; align-items: center; gap: .4rem; }
+.unassign-btn { background: none; border: none; color: var(--muted); cursor: pointer; font-size: .75rem; padding: 0; line-height: 1; }
+.unassign-btn:hover { color: #991b1b; }
+
+/* Reveal badge (shown after reveal) */
+.frise-reveal-badge { display: none; align-items: center; justify-content: center; min-height: 36px; border-radius: 10px; font-weight: 700; font-size: .9rem; padding: .35rem .75rem; transition: var(--t); }
+.frise-reveal-badge.correct   { background: var(--green-soft); color: #166534; border: 1.5px solid var(--green); }
+.frise-reveal-badge.wrong     { background: var(--red-soft); color: #991b1b; border: 1.5px solid var(--red); }
+.frise-reveal-badge.unguessed { background: var(--bg2); color: var(--muted); border: 1.5px solid var(--border); }
+
+/* Reveal bar */
+.reveal-bar { display: flex; flex-direction: column; align-items: center; gap: .5rem; width: 100%; max-width: 900px; margin-bottom: 1.5rem; }
+.btn-reveal-all { background: linear-gradient(135deg, var(--purple) 0%, #7c3aed 100%); color: #fff; font-size: .95rem; padding: .7rem 2rem; box-shadow: 0 4px 18px rgba(167,139,250,.4); }
+.btn-reveal-all:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(167,139,250,.5); }
+.btn-reveal-all:disabled { opacity: .6; cursor: default; transform: none; }
+.reveal-hint { font-size: .82rem; color: var(--muted); font-weight: 500; }
+
+/* Pending section */
+.pending-section { width: 100%; max-width: 900px; background: var(--gold-soft); border-radius: 14px; padding: 1rem 1.25rem; }
+.pending-section h3 { font-size: .85rem; font-weight: 700; color: #92400e; margin-bottom: .5rem; text-transform: uppercase; letter-spacing: .05em; }
+
+/* Copy toast */
+.copy-toast { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--navy); color: #fff; padding: .5rem 1.2rem; border-radius: var(--radius-pill); font-size: .82rem; font-weight: 600; opacity: 0; transition: opacity .3s, transform .3s; pointer-events: none; z-index: 999; }
+.copy-toast.visible { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* Responsive salon */
+@media (max-width: 600px) {
+  .salon-main { padding: 4.5rem .75rem 3rem; }
+  .salon-join-card { padding: 2rem 1.25rem; }
+  .frises-grid { grid-template-columns: 1fr; }
+  .recap-header { flex-direction: column; }
+  .recap-header-actions { width: 100%; }
+  .name-chip { font-size: .78rem; padding: .28rem .65rem; }
+}
