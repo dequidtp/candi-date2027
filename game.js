@@ -1056,6 +1056,8 @@ async function createSalonAndStart() {
     startGame();
   } catch (e) {
     btn.disabled = false; btn.textContent = 'Créer et jouer →';
+    const errEl = document.getElementById('modeCreateError');
+    if (errEl) { errEl.textContent = 'Erreur : ' + e.message; errEl.style.display = 'block'; }
   }
 }
 
