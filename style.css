@@ -365,8 +365,9 @@ body::before { content: ''; position: fixed; inset: 0; pointer-events: none; z-i
 .btn-salon { background: var(--green-soft); color: #166534; border: 1.5px solid var(--green); }
 .btn-salon:hover { background: var(--green); color: #fff; }
 
-/* Share panel — 3 options */
+/* Share panel — 2 or 3 options */
 .share-options-3 { grid-template-columns: repeat(3, 1fr) !important; }
+.share-options-2 { grid-template-columns: repeat(2, 1fr) !important; }
 .share-preview-salon { justify-content: center; }
 .share-preview-salon-hint { font-size: .7rem; color: #5b21b6; font-weight: 600; text-align: center; }
 

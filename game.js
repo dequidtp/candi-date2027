@@ -637,12 +637,15 @@ function showVictory(winner) {
   drawFrise(friseCanvas, winner, window.innerWidth < 769);
   launchConfetti();
 
-  // Salon context: show "Retourner au salon" button
+  // Salon context: show "Retourner au salon", adapt "Rejouer" label
   const salonCode = sessionStorage.getItem('salonCode');
-  const returnBtn = document.getElementById('returnToSalonBtn');
-  if (salonCode && returnBtn) {
-    returnBtn.style.display = 'inline-flex';
-    returnBtn.onclick = () => { window.location.href = `/salon.html?code=${salonCode}`; };
+  const returnBtn  = document.getElementById('returnToSalonBtn');
+  const restartBtn = document.getElementById('restartBtn');
+  if (salonCode) {
+    if (returnBtn)  { returnBtn.style.display  = 'inline-flex'; returnBtn.onclick = () => { window.location.href = `/salon.html?code=${salonCode}`; }; }
+    if (restartBtn)   restartBtn.textContent = '🔄 Nouvelle partie';
+  } else {
+    if (restartBtn)   restartBtn.textContent = '🔄 Rejouer';
   }
 }
 
@@ -844,6 +847,13 @@ function openSharePanel() {
   if (createBtn) { createBtn.disabled = false; createBtn.textContent = 'Créer le salon →'; }
   const salonResult = document.getElementById('salonResultWrap');
   if (salonResult) salonResult.style.display = 'none';
+
+  // Hide "Créer un salon" option when already in a salon context
+  const inSalonCtx = !!sessionStorage.getItem('salonCode');
+  const optSalonEl  = document.getElementById('optSalon');
+  const shareOptsEl = document.querySelector('.share-options');
+  if (optSalonEl)  optSalonEl.style.display = inSalonCtx ? 'none' : '';
+  if (shareOptsEl) { shareOptsEl.classList.toggle('share-options-3', !inSalonCtx); shareOptsEl.classList.toggle('share-options-2', inSalonCtx); }
 
   selectShareOption('reveal');
   document.getElementById('shareOverlay').style.display = 'flex';
@@ -1069,7 +1079,19 @@ function joinSalonFromMode() {
 
 document.addEventListener('DOMContentLoaded', () => {
   if (!document.getElementById('cardLeft')) return;
-  // If already in salon context (redirected from salon page), skip mode selection
+
+  // Reconstruct salon context from URL param if sessionStorage was lost (e.g. cross-tab navigation)
+  const urlParams    = new URLSearchParams(window.location.search);
+  const joinedSalon  = urlParams.get('joinedSalon');
+  if (joinedSalon) {
+    const storedToken = localStorage.getItem(`salon_${joinedSalon}_token`);
+    if (storedToken) {
+      sessionStorage.setItem('salonCode',  joinedSalon);
+      sessionStorage.setItem('salonToken', storedToken);
+    }
+    history.replaceState({}, '', '/');
+  }
+
   if (sessionStorage.getItem('salonCode')) {
     startGame();
   } else {

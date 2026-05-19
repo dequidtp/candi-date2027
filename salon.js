@@ -97,7 +97,7 @@ async function joinAndPlay() {
     localStorage.setItem(tokenKey(), token);
     sessionStorage.setItem('salonToken', token);
     sessionStorage.setItem('salonCode', salonCode);
-    window.location.href = '/';
+    window.location.href = `/?joinedSalon=${salonCode}`;
   } catch { btn.disabled = false; btn.textContent = 'Jouer →'; }
 }
 
@@ -118,7 +118,7 @@ function startPlay() {
   const token = localStorage.getItem(tokenKey());
   sessionStorage.setItem('salonToken', token);
   sessionStorage.setItem('salonCode', salonCode);
-  window.location.href = '/';
+  window.location.href = `/?joinedSalon=${salonCode}`;
 }
 
 // ── Recap ─────────────────────────────────────────────────────
