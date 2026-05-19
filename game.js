@@ -574,6 +574,7 @@ async function submitGameResult(winner) {
       });
       localStorage.setItem(`salon_${salonCode}_completed`, 'true');
       localStorage.setItem(`salon_${salonCode}_winner`, winner.name);
+      localStorage.setItem('lastSalonCode', salonCode);
     } catch (e) {}
   }
 }
@@ -832,7 +833,7 @@ let currentSalonUrl  = null;
 function openSharePanel() {
   if (!currentWinner) return;
 
-  const activeSalonCode = sessionStorage.getItem('salonCode');
+  const activeSalonCode = sessionStorage.getItem('salonCode') || localStorage.getItem('lastSalonCode');
   const shareOptsEl     = document.querySelector('.share-options');
   const normalBtnsEl    = document.getElementById('normalShareButtons');
   const inviteWrapEl    = document.getElementById('salonInviteWrap');
@@ -1031,7 +1032,7 @@ function copySalonLinkShare() {
 
 // ── Salon invite sharing (when already in a salon) ───────────
 function shareInviteWhatsApp() {
-  const code    = sessionStorage.getItem('salonCode');
+  const code    = sessionStorage.getItem('salonCode') || localStorage.getItem('lastSalonCode');
   const salonUrl = `${window.location.origin}/salon.html?code=${code}`;
   const text = `J'ai joué à Candi-date 2027 ! Rejoins le salon pour jouer et comparer nos résultats 🎮\n${salonUrl}`;
   if (navigator.canShare?.({ url: salonUrl })) {
@@ -1043,7 +1044,7 @@ function shareInviteWhatsApp() {
 }
 
 function copyInviteLink() {
-  const code    = sessionStorage.getItem('salonCode');
+  const code    = sessionStorage.getItem('salonCode') || localStorage.getItem('lastSalonCode');
   const salonUrl = `${window.location.origin}/salon.html?code=${code}`;
   navigator.clipboard.writeText(salonUrl).then(() => {
     const el = document.getElementById('copyConfirm');
@@ -1054,6 +1055,15 @@ function copyInviteLink() {
 
 // ── Mode selection ────────────────────────────────────────────
 function showModeOverlay() {
+  const lastCode  = localStorage.getItem('lastSalonCode');
+  const bannerEl  = document.getElementById('salonReturnBanner');
+  const bannerLink = document.getElementById('salonReturnLink');
+  if (bannerEl && lastCode) {
+    bannerEl.style.display = 'block';
+    if (bannerLink) bannerLink.href = `/salon.html?code=${lastCode}`;
+  } else if (bannerEl) {
+    bannerEl.style.display = 'none';
+  }
   document.getElementById('modeOverlay').style.display = 'flex';
   showModeOptions();
 }
@@ -1074,6 +1084,7 @@ function showMultiOptions() {
 }
 
 function startSolo() {
+  localStorage.removeItem('lastSalonCode');
   hideModeOverlay();
   startGame();
 }
@@ -1140,6 +1151,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (storedToken) {
       sessionStorage.setItem('salonCode',  joinedSalon);
       sessionStorage.setItem('salonToken', storedToken);
+    } else if (!sessionStorage.getItem('salonCode')) {
+      // No token found (fresh session / different tab) → redirect to salon join page
+      window.location.replace(`/salon.html?code=${joinedSalon}`);
+      return;
     }
     history.replaceState({}, '', '/');
   }
