@@ -399,7 +399,7 @@ body::before { content: ''; position: fixed; inset: 0; pointer-events: none; z-i
 .salon-go-btn { font-size: .85rem; }
 
 /* Page salon principale */
-.salon-main { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: 5rem 1rem 4rem; gap: 2rem; }
+.salon-main { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: 5rem 1rem 9rem; gap: 2rem; }
 
 .salon-state { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; gap: 1rem; }
 
@@ -479,8 +479,8 @@ body::before { content: ''; position: fixed; inset: 0; pointer-events: none; z-i
 .frise-reveal-badge.wrong     { background: var(--red-soft); color: #991b1b; border: 1.5px solid var(--red); }
 .frise-reveal-badge.unguessed { background: var(--bg2); color: var(--muted); border: 1.5px solid var(--border); }
 
-/* Reveal bar */
-.reveal-bar { display: flex; flex-direction: column; align-items: center; gap: .5rem; width: 100%; max-width: 900px; margin-bottom: 1.5rem; }
+/* Reveal bar — floating sticky footer */
+.reveal-bar { position: fixed; bottom: 0; left: 0; right: 0; z-index: 50; display: flex; flex-direction: column; align-items: center; gap: .3rem; padding: .75rem 1rem calc(.75rem + env(safe-area-inset-bottom)); background: rgba(244,240,235,.88); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-top: 1px solid var(--border); box-shadow: 0 -4px 20px rgba(0,0,0,.07); }
 .btn-reveal-all { background: linear-gradient(135deg, var(--purple) 0%, #7c3aed 100%); color: #fff; font-size: .95rem; padding: .7rem 2rem; box-shadow: 0 4px 18px rgba(167,139,250,.4); }
 .btn-reveal-all:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(167,139,250,.5); }
 .btn-reveal-all:disabled { opacity: .6; cursor: default; transform: none; }
@@ -496,7 +496,7 @@ body::before { content: ''; position: fixed; inset: 0; pointer-events: none; z-i
 
 /* Responsive salon */
 @media (max-width: 600px) {
-  .salon-main { padding: 4.5rem .75rem 3rem; }
+  .salon-main { padding: 4.5rem .75rem 9rem; }
   .salon-join-card { padding: 2rem 1.25rem; }
   .frises-grid { grid-template-columns: 1fr; }
   .recap-header { flex-direction: column; }
