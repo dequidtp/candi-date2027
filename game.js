@@ -1140,7 +1140,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Opt-out from salon invitation → start solo directly, no overlay
   if (urlParams.get('startSolo') === '1') {
-    history.replaceState({}, '', '/');
+    window.history.replaceState({}, '', '/');
     startGame();
     return;
   }
@@ -1156,7 +1156,7 @@ document.addEventListener('DOMContentLoaded', () => {
       window.location.replace(`/salon.html?code=${joinedSalon}`);
       return;
     }
-    history.replaceState({}, '', '/');
+    window.history.replaceState({}, '', '/');
   }
 
   if (sessionStorage.getItem('salonCode')) {
