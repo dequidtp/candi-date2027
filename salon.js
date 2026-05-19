@@ -93,8 +93,9 @@ async function joinAndPlay() {
       body: JSON.stringify({ code: salonCode, nickname })
     });
     if (!r.ok) { alert((await r.json()).error || 'Erreur'); btn.disabled = false; btn.textContent = 'Jouer →'; return; }
-    const { token } = await r.json();
+    const { token, player_id } = await r.json();
     localStorage.setItem(tokenKey(), token);
+    if (player_id) localStorage.setItem(`salon_${salonCode}_player_id`, player_id);
     sessionStorage.setItem('salonToken', token);
     sessionStorage.setItem('salonCode', salonCode);
     window.location.href = `/?joinedSalon=${salonCode}`;
@@ -160,6 +161,16 @@ function renderNameChips(allNicknames) {
     chip.className = 'name-chip';
     chip.textContent = name;
     chip.dataset.name = name;
+    chip.draggable = true;
+    chip.addEventListener('dragstart', e => {
+      if (revealed) { e.preventDefault(); return; }
+      e.dataTransfer.setData('text/plain', name);
+      e.dataTransfer.effectAllowed = 'move';
+      selectedName = name;
+      chip.classList.add('dragging');
+      refreshChips();
+    });
+    chip.addEventListener('dragend', () => chip.classList.remove('dragging'));
     chip.onclick = () => selectNameChip(name);
     wrap.appendChild(chip);
   });
@@ -194,9 +205,12 @@ function renderFrisesGrid() {
     card.className = 'frise-card';
     card.dataset.playerId = player.id;
 
+    const myPlayerId = localStorage.getItem(`salon_${salonCode}_player_id`);
+    const isMyFrise  = myPlayerId && player.id === myPlayerId;
+
     const number = document.createElement('div');
-    number.className = 'frise-anon-label';
-    number.textContent = `Frise #${idx + 1}`;
+    number.className = isMyFrise ? 'frise-anon-label my-frise' : 'frise-anon-label';
+    number.textContent = isMyFrise ? `⭐ Ma frise` : `Frise #${idx + 1}`;
 
     const canvasWrap = document.createElement('div');
     canvasWrap.className = 'frise-canvas-wrap';
@@ -209,8 +223,21 @@ function renderFrisesGrid() {
     const assignSlot = document.createElement('div');
     assignSlot.className = 'frise-assign-slot';
     assignSlot.dataset.playerId = player.id;
-    assignSlot.innerHTML = '<span class="assign-placeholder">Appuyez sur un nom puis ici</span>';
+    assignSlot.innerHTML = '<span class="assign-placeholder">Glissez ou appuyez sur un nom</span>';
     assignSlot.onclick = () => assignToPlayer(player.id, assignSlot);
+    assignSlot.addEventListener('dragover', e => {
+      if (revealed) return;
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      assignSlot.classList.add('drag-over');
+    });
+    assignSlot.addEventListener('dragleave', () => assignSlot.classList.remove('drag-over'));
+    assignSlot.addEventListener('drop', e => {
+      e.preventDefault();
+      assignSlot.classList.remove('drag-over');
+      const name = e.dataTransfer.getData('text/plain');
+      if (name) { selectedName = name; assignToPlayer(player.id, assignSlot); }
+    });
 
     const revealBadge = document.createElement('div');
     revealBadge.className = 'frise-reveal-badge';

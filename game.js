@@ -960,7 +960,8 @@ async function createSalonFromShare() {
       body: JSON.stringify({ code, nickname })
     });
     if (!joinRes.ok) throw new Error('Erreur rejoindre salon');
-    const { token } = await joinRes.json();
+    const { token, player_id } = await joinRes.json();
+    if (player_id) localStorage.setItem(`salon_${code}_player_id`, player_id);
 
     await fetch(`${BACKEND_URL}/api/salon/complete`, {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -1056,9 +1057,10 @@ async function createSalonAndStart() {
       body: JSON.stringify({ code, nickname })
     });
     if (!joinRes.ok) throw new Error('Erreur rejoindre salon');
-    const { token } = await joinRes.json();
+    const { token, player_id } = await joinRes.json();
 
     localStorage.setItem(`salon_${code}_token`, token);
+    if (player_id) localStorage.setItem(`salon_${code}_player_id`, player_id);
     sessionStorage.setItem('salonToken', token);
     sessionStorage.setItem('salonCode', code);
 

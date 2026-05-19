@@ -436,6 +436,10 @@ body::before { content: ''; position: fixed; inset: 0; pointer-events: none; z-i
 .name-chip.selected { background: var(--purple); border-color: var(--purple); color: #fff; transform: scale(1.04); }
 .name-chip.assigned { background: var(--green-soft); border-color: var(--green); color: #166534; }
 .name-chip:disabled { opacity: .45; cursor: default; }
+.name-chip[draggable="true"] { cursor: grab; }
+.name-chip.dragging { opacity: .4; cursor: grabbing; transform: scale(.96); }
+.frise-assign-slot.drag-over { border-color: var(--purple); background: var(--purple-soft); transform: scale(1.02); }
+.frise-anon-label.my-frise { color: #7c3aed; }
 
 /* Frises grid */
 .frises-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.25rem; width: 100%; max-width: 900px; margin-bottom: 1.5rem; }
