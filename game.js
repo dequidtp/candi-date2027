@@ -1160,6 +1160,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   if (sessionStorage.getItem('salonCode')) {
+    hideModeOverlay();
     startGame();
   } else {
     showModeOverlay();
