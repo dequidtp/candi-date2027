@@ -139,7 +139,7 @@ function showRecap() {
   assignments = {};
   revealed    = false;
 
-  renderNameChips(all.map(p => p.nickname));
+  renderNameChips(completed.map(p => p.nickname));
   renderFrisesGrid();
   updateRevealBtn();
 
@@ -337,7 +337,10 @@ function drawFriseFromSegments(canvas, segments, isMobile) {
   if (!segments || !segments.length) return;
 
   const dpr = Math.max(window.devicePixelRatio || 1, 2);
-  const W   = isMobile ? 300 : 520;
+  // Measure available width from the parent container (minus its horizontal padding of 24px)
+  const parentW = canvas.parentElement ? canvas.parentElement.clientWidth - 24 : 0;
+  const maxW    = isMobile ? 380 : 560;
+  const W       = Math.min(Math.max(200, parentW > 0 ? parentW : maxW), maxW);
   const barH = isMobile ? 34 : 42;
   const legendEstimate = 36;
   const H = isMobile ? 100 + legendEstimate : 110 + legendEstimate;

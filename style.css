@@ -448,7 +448,7 @@ body::before { content: ''; position: fixed; inset: 0; pointer-events: none; z-i
 
 .frise-anon-label { padding: .65rem 1rem .25rem; font-size: .72rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .07em; }
 .frise-canvas-wrap { padding: .25rem .75rem .5rem; }
-.frise-canvas-wrap canvas { display: block; width: 100%; }
+.frise-canvas-wrap canvas { display: block; max-width: 100%; }
 
 /* Frise card footer — assign zone */
 .frise-card-footer { padding: .5rem .75rem .85rem; }
