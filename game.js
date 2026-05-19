@@ -638,15 +638,18 @@ function showVictory(winner) {
   drawFrise(friseCanvas, winner, window.innerWidth < 769);
   launchConfetti();
 
-  // Salon context: show "Retourner au salon", adapt "Rejouer" label
-  const salonCode = sessionStorage.getItem('salonCode');
+  // Salon context: show teaser + primary CTA, adapt "Rejouer" label
+  const salonCode  = sessionStorage.getItem('salonCode');
   const returnBtn  = document.getElementById('returnToSalonBtn');
   const restartBtn = document.getElementById('restartBtn');
+  const teaser     = document.getElementById('victorySalonTeaser');
   if (salonCode) {
-    if (returnBtn)  { returnBtn.style.display  = 'inline-flex'; returnBtn.onclick = () => { window.location.href = `/salon.html?code=${salonCode}`; }; }
-    if (restartBtn)   restartBtn.textContent = '🔄 Nouvelle partie';
+    if (returnBtn)  { returnBtn.style.display = 'inline-flex'; returnBtn.onclick = () => { window.location.href = `/salon.html?code=${salonCode}`; }; }
+    if (restartBtn)   restartBtn.textContent = '🔄 Rejouer';
+    if (teaser)       teaser.style.display   = 'flex';
   } else {
     if (restartBtn)   restartBtn.textContent = '🔄 Rejouer';
+    if (teaser)       teaser.style.display   = 'none';
   }
 }
 
@@ -670,6 +673,7 @@ function restartGame() {
   salonSubmitted = false;
   document.getElementById('victoryScreen').style.display = 'none';
   document.getElementById('returnToSalonBtn').style.display = 'none';
+  const t = document.getElementById('victorySalonTeaser'); if (t) t.style.display = 'none';
   showModeOverlay();
 }
 

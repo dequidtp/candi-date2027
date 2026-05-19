@@ -179,10 +179,19 @@
         <canvas id="friseCanvas" style="width:100%;border-radius:10px;"></canvas>
       </div>
 
+      <!-- Salon teaser (shown only in salon context) -->
+      <div class="victory-salon-teaser" id="victorySalonTeaser" style="display:none">
+        <span class="teaser-icon">🕵️</span>
+        <div>
+          <strong>Vos amis ont aussi joué !</strong>
+          <p>Devinez leurs résultats dans le jeu d'appariement.</p>
+        </div>
+      </div>
+
       <div class="victory-actions">
+        <button class="btn btn-primary" id="returnToSalonBtn" style="display:none">🕵️ Deviner les résultats →</button>
         <button class="btn btn-primary" id="restartBtn" onclick="restartGame()">🔄 Rejouer</button>
         <button class="btn btn-share" onclick="openSharePanel()">🔗 Partager</button>
-        <button class="btn btn-salon" id="returnToSalonBtn" style="display:none">👥 Retourner au salon</button>
       </div>
     </div>
   </div>

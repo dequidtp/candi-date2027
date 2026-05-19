@@ -118,6 +118,10 @@ body::before { content: ''; position: fixed; inset: 0; pointer-events: none; z-i
 .victory-desc  { color: var(--muted); font-size: .8rem; margin-bottom: .3rem; }
 .victory-badge { display: inline-block; }
 .victory-actions { display: flex; gap: .75rem; justify-content: center; flex-wrap: wrap; margin-top: .75rem; }
+.victory-salon-teaser { display: flex; align-items: center; gap: .75rem; background: var(--purple-soft); border: 1.5px solid var(--purple); border-radius: 12px; padding: .7rem 1rem; margin-top: .9rem; text-align: left; }
+.victory-salon-teaser .teaser-icon { font-size: 1.6rem; flex-shrink: 0; }
+.victory-salon-teaser strong { font-size: .88rem; color: var(--navy); display: block; margin-bottom: .1rem; }
+.victory-salon-teaser p { font-size: .76rem; color: var(--muted); margin: 0; }
 
 /* ── Confetti ── */
 .confetti-container { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
