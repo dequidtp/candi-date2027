@@ -413,7 +413,8 @@ body::before { content: ''; position: fixed; inset: 0; pointer-events: none; z-i
 .salon-join-form input { padding: .7rem 1.1rem; border-radius: var(--radius-pill); border: 1.5px solid var(--border); font-family: var(--font-b); font-size: .95rem; outline: none; background: var(--bg); }
 .salon-join-form input:focus { border-color: var(--purple); background: var(--card); }
 .salon-hint { font-size: .76rem; color: var(--muted); }
-.salon-solo-optout { display: block; margin-top: 1.1rem; font-size: .74rem; color: var(--muted); text-align: center; text-decoration: none; transition: color .2s; }
+.salon-join-links { display: flex; flex-direction: column; gap: .2rem; margin-top: .6rem; }
+.salon-solo-optout { display: block; font-size: .74rem; color: var(--muted); text-align: center; text-decoration: none; background: none; border: none; cursor: pointer; padding: 0; transition: color .2s; font-family: var(--font-b); }
 .salon-solo-optout:hover { color: var(--navy); }
 
 /* Mini player list */

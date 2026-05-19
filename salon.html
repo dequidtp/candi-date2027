@@ -69,7 +69,10 @@
           <button class="btn btn-primary" onclick="joinAndPlay()">Jouer →</button>
         </div>
         <p class="salon-hint">Vous serez redirigé vers le jeu, puis vos résultats apparaîtront ici.</p>
-        <a href="/?startSolo=1" class="salon-solo-optout">Je préfère ne pas jouer avec mes amis et lancer une partie solo →</a>
+        <div class="salon-join-links">
+          <a href="/?startSolo=1" class="salon-solo-optout">Je veux jouer solo →</a>
+          <button class="salon-solo-optout" onclick="viewSalonRecap()">Voir les résultats sans jouer →</button>
+        </div>
       </div>
     </div>
 
@@ -81,6 +84,7 @@
         <h2>À vous de jouer !</h2>
         <p>Vous avez rejoint le salon. Jouez pour que vos résultats apparaissent dans le récap.</p>
         <button class="btn btn-primary" onclick="startPlay()">Jouer maintenant →</button>
+        <button class="salon-solo-optout" style="margin-top:.5rem" onclick="viewSalonRecap()">Voir les résultats du salon →</button>
         <div id="waitingPlayerList" class="salon-player-list-mini"></div>
       </div>
     </div>

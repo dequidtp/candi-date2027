@@ -102,6 +102,10 @@ async function joinAndPlay() {
   } catch { btn.disabled = false; btn.textContent = 'Jouer →'; }
 }
 
+function viewSalonRecap() {
+  showRecap();
+}
+
 // ── Waiting (has token but not completed) ─────────────────────
 function showWaiting() {
   showState('waiting');
