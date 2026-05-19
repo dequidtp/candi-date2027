@@ -831,31 +831,50 @@ let currentSalonUrl  = null;
 
 function openSharePanel() {
   if (!currentWinner) return;
-  shareMode = 'reveal';
-  const imgEl    = document.getElementById('sharePreviewImg');
-  const avatarEl = document.getElementById('sharePreviewAvatar');
-  setPhoto(imgEl, avatarEl, currentWinner);
-  avatarEl.style.width = '22px'; avatarEl.style.height = '22px'; avatarEl.style.fontSize = '8px';
-  document.getElementById('previewName').textContent = currentWinner.name;
 
-  // Reset salon state
-  currentSalonCode = null;
-  currentSalonUrl  = null;
-  const nickInput = document.getElementById('shareSalonNickname');
-  if (nickInput) nickInput.value = '';
-  const createBtn = document.getElementById('shareSalonCreateBtn');
-  if (createBtn) { createBtn.disabled = false; createBtn.textContent = 'Créer le salon →'; }
-  const salonResult = document.getElementById('salonResultWrap');
-  if (salonResult) salonResult.style.display = 'none';
+  const activeSalonCode = sessionStorage.getItem('salonCode');
+  const shareOptsEl     = document.querySelector('.share-options');
+  const normalBtnsEl    = document.getElementById('normalShareButtons');
+  const inviteWrapEl    = document.getElementById('salonInviteWrap');
+  const titleEl         = document.querySelector('.share-title');
+  const subtitleEl      = document.getElementById('shareSubtitle');
 
-  // Hide "Créer un salon" option when already in a salon context
-  const inSalonCtx = !!sessionStorage.getItem('salonCode');
-  const optSalonEl  = document.getElementById('optSalon');
-  const shareOptsEl = document.querySelector('.share-options');
-  if (optSalonEl)  optSalonEl.style.display = inSalonCtx ? 'none' : '';
-  if (shareOptsEl) { shareOptsEl.classList.toggle('share-options-3', !inSalonCtx); shareOptsEl.classList.toggle('share-options-2', inSalonCtx); }
+  if (activeSalonCode) {
+    // ── Salon context: only show "Inviter au salon" ──
+    const salonUrl = `${window.location.origin}/salon.html?code=${activeSalonCode}`;
+    document.getElementById('salonInviteCode').textContent = activeSalonCode;
+    document.getElementById('goToMySalonBtn').href = salonUrl;
 
-  selectShareOption('reveal');
+    if (shareOptsEl)  shareOptsEl.style.display  = 'none';
+    if (normalBtnsEl) normalBtnsEl.style.display  = 'none';
+    if (inviteWrapEl) inviteWrapEl.style.display  = 'flex';
+    if (titleEl)      titleEl.textContent         = 'Inviter au salon';
+    if (subtitleEl)   subtitleEl.textContent      = 'Partagez le lien pour que vos amis rejoignent le salon et comparent vos résultats !';
+  } else {
+    // ── Solo context: reveal / secret / create salon ──
+    shareMode = 'reveal';
+    const imgEl    = document.getElementById('sharePreviewImg');
+    const avatarEl = document.getElementById('sharePreviewAvatar');
+    setPhoto(imgEl, avatarEl, currentWinner);
+    avatarEl.style.width = '22px'; avatarEl.style.height = '22px'; avatarEl.style.fontSize = '8px';
+    document.getElementById('previewName').textContent = currentWinner.name;
+
+    // Reset salon-creation state
+    currentSalonCode = null;
+    currentSalonUrl  = null;
+    const nickInput = document.getElementById('shareSalonNickname');
+    if (nickInput) nickInput.value = '';
+    const createBtn = document.getElementById('shareSalonCreateBtn');
+    if (createBtn) { createBtn.disabled = false; createBtn.textContent = 'Créer le salon →'; }
+    if (document.getElementById('salonResultWrap')) document.getElementById('salonResultWrap').style.display = 'none';
+
+    if (shareOptsEl)  { shareOptsEl.style.display = ''; shareOptsEl.className = 'share-options share-options-3'; }
+    if (inviteWrapEl) inviteWrapEl.style.display  = 'none';
+    if (titleEl)      titleEl.textContent         = 'Partager le jeu';
+
+    selectShareOption('reveal');
+  }
+
   document.getElementById('shareOverlay').style.display = 'flex';
   document.getElementById('copyConfirm').classList.remove('visible');
 }
@@ -1010,6 +1029,29 @@ function copySalonLinkShare() {
   });
 }
 
+// ── Salon invite sharing (when already in a salon) ───────────
+function shareInviteWhatsApp() {
+  const code    = sessionStorage.getItem('salonCode');
+  const salonUrl = `${window.location.origin}/salon.html?code=${code}`;
+  const text = `J'ai joué à Candi-date 2027 ! Rejoins le salon pour jouer et comparer nos résultats 🎮\n${salonUrl}`;
+  if (navigator.canShare?.({ url: salonUrl })) {
+    navigator.share({ title: 'Candi-date 2027 — Salon', text, url: salonUrl })
+      .catch(() => window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank'));
+  } else {
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+  }
+}
+
+function copyInviteLink() {
+  const code    = sessionStorage.getItem('salonCode');
+  const salonUrl = `${window.location.origin}/salon.html?code=${code}`;
+  navigator.clipboard.writeText(salonUrl).then(() => {
+    const el = document.getElementById('copyConfirm');
+    el.classList.add('visible');
+    setTimeout(() => el.classList.remove('visible'), 2500);
+  });
+}
+
 // ── Mode selection ────────────────────────────────────────────
 function showModeOverlay() {
   document.getElementById('modeOverlay').style.display = 'flex';
@@ -1084,6 +1126,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Reconstruct salon context from URL param if sessionStorage was lost (e.g. cross-tab navigation)
   const urlParams    = new URLSearchParams(window.location.search);
+
+  // Opt-out from salon invitation → start solo directly, no overlay
+  if (urlParams.get('startSolo') === '1') {
+    history.replaceState({}, '', '/');
+    startGame();
+    return;
+  }
+
   const joinedSalon  = urlParams.get('joinedSalon');
   if (joinedSalon) {
     const storedToken = localStorage.getItem(`salon_${joinedSalon}_token`);

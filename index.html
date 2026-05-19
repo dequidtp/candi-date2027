@@ -243,6 +243,20 @@
         </div>
       </div>
 
+      <!-- Salon context: invite friends -->
+      <div id="salonInviteWrap" style="display:none" class="salon-share-result">
+        <div class="salon-share-result-code">
+          Code : <strong id="salonInviteCode"></strong>
+        </div>
+        <div class="share-buttons">
+          <button class="btn btn-whatsapp" onclick="shareInviteWhatsApp()">💬 Partager sur WhatsApp</button>
+          <div class="share-buttons-row">
+            <button class="btn btn-ghost" onclick="copyInviteLink()">📋 Copier le lien</button>
+            <a id="goToMySalonBtn" href="#" class="btn btn-salon">Voir le salon →</a>
+          </div>
+        </div>
+      </div>
+
       <!-- Boutons partage normaux (reveal / secret) -->
       <div id="normalShareButtons" class="share-buttons">
         <button class="btn btn-whatsapp" onclick="shareWhatsApp()">💬 Partager sur WhatsApp</button>
