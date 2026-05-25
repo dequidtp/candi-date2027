@@ -448,8 +448,30 @@ body::before { content: ''; position: fixed; inset: 0; pointer-events: none; z-i
 .name-chip:disabled { opacity: .45; cursor: default; }
 .name-chip[draggable="true"] { cursor: grab; }
 .name-chip.dragging { opacity: .4; cursor: grabbing; transform: scale(.96); }
-.frise-assign-slot.drag-over { border-color: var(--purple); background: var(--purple-soft); transform: scale(1.02); }
-.frise-anon-label.my-frise { color: #7c3aed; }
+
+/* ── Mobile: floating sticky name chips bar ── */
+@media (max-width: 600px) {
+  .name-chips-wrap {
+    position: fixed;
+    bottom: 56px; /* above the reveal bar */
+    left: 0; right: 0;
+    z-index: 60;
+    background: rgba(244,240,235,.96);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-top: 1px solid var(--border);
+    padding: .5rem .75rem .4rem;
+    margin-bottom: 0;
+    box-shadow: 0 -2px 12px rgba(0,0,0,.06);
+    max-width: 100%;
+  }
+  .chips-label { font-size: .68rem; margin-bottom: .3rem; }
+  .name-chips { flex-wrap: nowrap; overflow-x: auto; gap: .35rem; padding-bottom: .15rem; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+  .name-chips::-webkit-scrollbar { display: none; }
+  .name-chip { white-space: nowrap; flex-shrink: 0; font-size: .78rem; padding: .28rem .65rem; }
+  /* Extra bottom padding so frises aren't hidden behind floating bars */
+  #stateRecap .frises-grid { padding-bottom: 7rem; }
+}
 
 /* Frises grid */
 .frises-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.25rem; width: 100%; max-width: 900px; margin-bottom: 1.5rem; }
