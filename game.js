@@ -263,9 +263,26 @@ function getBadgeStyle(color) {
 
 // ── Profile scoring ───────────────────────────────────────────
 function updateProfile(winner) {
-  (winner.tags || []).forEach(tag => {
+  const tags = winner.tags || [];
+  tags.forEach(tag => {
     profileScore[tag] = (profileScore[tag] || 0) + 1;
   });
+  // Special case: media candidates also boost a random non-media tag
+  // to avoid clustering too many media candidates together
+  if (tags.includes('media')) {
+    const otherTags = tags.filter(t => t !== 'media' && t !== 'electron_libre');
+    if (otherTags.length > 0) {
+      const randomTag = otherTags[Math.floor(Math.random() * otherTags.length)];
+      profileScore[randomTag] = (profileScore[randomTag] || 0) + 1;
+    } else {
+      // No other tags — boost a random existing profile tag instead
+      const existingTags = Object.keys(profileScore).filter(t => t !== 'media' && t !== 'electron_libre');
+      if (existingTags.length > 0) {
+        const randomTag = existingTags[Math.floor(Math.random() * existingTags.length)];
+        profileScore[randomTag] = (profileScore[randomTag] || 0) + 1;
+      }
+    }
+  }
 }
 
 function candidateScore(candidate) {
