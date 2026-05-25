@@ -131,7 +131,7 @@ body::before { content: ''; position: fixed; inset: 0; pointer-events: none; z-i
 /* ── Share ── */
 .share-overlay { position: fixed; inset: 0; background: rgba(30,27,46,.45); backdrop-filter: blur(4px); display: flex; align-items: flex-end; justify-content: center; z-index: 300; padding: 1rem; }
 @media (min-width: 600px) { .share-overlay { align-items: center; } }
-.share-panel { background: var(--card); border-radius: 24px; box-shadow: var(--shadow-lg); padding: 2rem 1.75rem 1.75rem; width: 100%; max-width: 420px; position: relative; animation: slideUpPanel .3s ease; }
+.share-panel { background: var(--card); border-radius: 24px; box-shadow: var(--shadow-lg); padding: 2rem 1.75rem 1.75rem; width: 100%; max-width: 420px; position: relative; animation: slideUpPanel .3s ease; max-height: 90vh; overflow-y: auto; }
 @keyframes slideUpPanel { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
 .share-close { position: absolute; top: 1rem; right: 1rem; background: var(--bg2); border: none; border-radius: 50%; width: 28px; height: 28px; cursor: pointer; font-size: .85rem; color: var(--muted); display: flex; align-items: center; justify-content: center; }
 .share-close:hover { background: var(--border); }
@@ -159,6 +159,10 @@ body::before { content: ''; position: fixed; inset: 0; pointer-events: none; z-i
 .share-buttons-row .btn { justify-content: center; }
 .copy-confirm { text-align: center; font-size: .82rem; font-weight: 600; color: #166534; margin-top: .6rem; min-height: 1.2rem; opacity: 0; transition: opacity .3s; }
 .copy-confirm.visible { opacity: 1; }
+
+/* Share options 3 colonnes sur desktop, 1 colonne sur mobile */
+.share-options-3 { grid-template-columns: repeat(3, 1fr); }
+@media (max-width: 600px) { .share-options-3 { grid-template-columns: 1fr; } }
 
 /* ── Mobile bar ── */
 .mobile-bar { display: none; position: fixed; bottom: 0; left: 0; right: 0; background: rgba(244,240,235,.95); backdrop-filter: blur(12px); border-top: 1px solid var(--border); padding: .75rem 1.2rem; justify-content: center; z-index: 99; }
